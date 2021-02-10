@@ -104,6 +104,7 @@ $$
 ```julia:./populationcellprob
 using Statistics
 using StatsPlots
+using StatsPlots.PlotMeasures
 srd[:,:P] = srd.N ./ [ N_sum[j] for j in srd.jahr ]
 srd[:,:cell] = collect(zip(srd.alter,srd.geschlecht))
 gsrd = groupby(srd, :cell)
