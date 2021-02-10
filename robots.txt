@@ -1,0 +1,4 @@
+Sitemap: https://gkappler.github.io/Sterbestatistik/sitemap.xml
+
+User-agent: *
+Disallow:

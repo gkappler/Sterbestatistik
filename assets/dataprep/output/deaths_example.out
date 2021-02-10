@@ -1,0 +1,2 @@
+f(alter = 0:30, geschlecht = "Männlich", jahr = 2020, kw = 1) = (N = 12943028, D = 54)
+f(alter = 30:35, geschlecht = "Männlich", jahr = 2020) = (N = 2830265, D = 1823)

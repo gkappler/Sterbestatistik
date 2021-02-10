@@ -1,0 +1,36 @@
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/libs/highlight/github.min.css"> <link rel=stylesheet  href="/css/franklin.css"> <link rel=stylesheet  href="/css/tufte.css"> <link rel=stylesheet  href="/css/latex.css"> <link rel=stylesheet  href="/css/adjust.css"> <link rel=icon  href="/assets/favicon.png"> <title>Decentral data preparation with julia?</title> <div id=layout > <div id=menu > <ul> <li><a href="/">Mortalities</a> <li><a href="/dataprep/">Preparation</a> <li><a href="/averageeffects/">Analysis</a> <li><a href="/reflection/">Reflection</a> </ul> </div> <div id=main > <div class=franklin-content ><p>Such data preparation feels like solving a crossword puzzle. Felt sometimes like catching fleas. I often get impatient and wonder: am I wasting time with a task that the devil prepared to catch my life?</p> <p>To not waste life, I wonder, how it should be... so this official important data would not be painful to use. Or painful only for one person once. But then again, are we not used to some data pain in 2020?</p> <p>I wonder whether it would be best to have this data published a julia package, e.g.</p> <pre><code class="julia hljs"><span class=hljs-keyword >using</span> IMSterbestatistik</code></pre>
+<p>&#40;where IM stands for Information Mycelium&#41;</p>
+<p>Or a InformationMycelium package</p>
+<pre><code class="julia hljs"><span class=hljs-keyword >using</span> InformationMycelium
+<span class=hljs-meta >@mycelium</span> github.com/gkappler/Sterbestatistik</code></pre>
+<p>And then have the functions loaded into Main module by macro.</p>
+<p>I would be interested to hear your idea and opinion.</p>
+<h2 id=my_impression_from_this_exploration_with_public_data ><a href="#my_impression_from_this_exploration_with_public_data">My impression from this exploration with public data: </a></h2>
+<ul>
+<li><p>How easily can data published by state institutions be used for reproducible research? <strong>space for improvement</strong></p>
+
+<li><p>Publishing the scripts for data prep. </p>
+
+<li><p>Utility of julia language for data preparation,</p>
+
+<li><p>can&#39;t we organize data prep of such data dezentrally?</p>
+
+</ul>
+<h1 id=datengrundlage ><a href="#datengrundlage">Datengrundlage</a></h1>
+<h2 id=informations-mycel ><a href="#informations-mycel">Informations-Mycel</a></h2>
+<p>Die Daten des statistischen Bundesamtes sind Daten verfügbar nach Auswahl von Spalten. Es existiert auch ein API zur Abfrage der Daten des statistischen Bundesamtes. Dieses wurde hier nicht verwendet, da die Definition der Schnittstelle sehr umfangreich ist. Für spezifische Daten wie hier ist das manuelle Herunterladen und Auslesen mit Hilfsfunktionen schneller umzusetzen.</p>
+<p>CAVEAT:</p>
+<ul>
+<li><p>Alternative Data &#40;not used&#41;: <a href="https://service.destatis.de/bevoelkerungspyramide/index.html#&#33;y&#61;2018&amp;v&#61;2">Pyramide</a></p>
+
+<li><p><a href="https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Sterbefaelle-Lebenserwartung/Podcast/podcast-sterbefaelle.html">Podcast</a></p>
+
+</ul>
+<div class=page-foot >
+  <div class=copyright >
+    &copy; Dr. Gregor Kappler. Last modified: February 10, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
+  </div>
+</div>
+</div>
+        </div> 
+    </div>
