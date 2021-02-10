@@ -63,8 +63,8 @@ tmp |> println
 ## Random Variables
 Are the strict formulations in probability theory, for scientific notation.
 ### Observables:
-- Deaths $D: \Omega \rightarrow \mathbb{N}$
-- Population $N: \Omega \rightarrow \mathbb{N}$
+- Deaths $D | J,W,G,A: \Omega \rightarrow \mathbb{N}$
+- Population $N |J,G,A: \Omega \rightarrow \mathbb{N}$
 ### Conditioning Variables:
 - Geschlechter/Gender $G: \Omega \rightarrow \{Männlich, Weiblich\}$
 - Jahre/years $J: \Omega \rightarrow \{2016,\ldots,2020\}$
@@ -72,21 +72,21 @@ Are the strict formulations in probability theory, for scientific notation.
 - altersgruppen, age: $A: \Omega \rightarrow \{\textoutput{./agegroups}\}$
 
 ## Probabilities and adjusted Expectations
-Sterblichkeit adjustiert auf Durchschnitt
+Sterblichkeit adjustiert auf Durchschnitt:
 $$
-E^{adj}(D | J, W) = \sum_{a,g \in A, G} \left[ 
-	\underbrace{E\left( \frac{D}{N} | a=A, g=G, J, W \right)}_{A \times G\text{ mortality rates}}
+E^{adj}(D | J=j, W=w) = \sum_{a,g \in A, G} \left[ 
+	\underbrace{E\left( \frac{D}{N} | A=a, G=g, J=j, W=w \right)}_{A \times G\text{ mortality rates}}
 	\underbrace{P(A=a, G=g)}_{A \times G\text{ distribution}} 
   \right]
-  	\underbrace{E(N)}_{\text{normalization}}
+  	\underbrace{E(N)}_{\text{normalization}},
 $$
-
+$\forall j \in \{2016,\ldots,2020\}, w \in \{1,\ldots,53\}$
 
 ### Notes regarding Notation (Photo Rolf)
 were expanded with $W$ for week number.
 #### Formel (1)
 $$
-P^{2016}( + | G, A) = E\left[\frac{D}{P} | A, G, J=2016, W \right]
+P^{2016}( I_+=1 | G=g, A=a) = E\left[\frac{D}{N} | A=a, G=g, J=2016, W=w \right]
 $$
 
 #### Formel (2)
@@ -111,7 +111,11 @@ P_mean = Dict([ r[1] => r[2]
                 for r in eachrow(combine(gsrd, :P=>mean))
 			  ])
 		
-		
+```
+
+This plot is only for checking errors:
+```julia:./populationcellprob2
+# hideall
 tmp = [ ( A=k[1].start, G=k[2], p = 100*v/(k[1].stop-k[1].start)) 
 	    for (k,v) in P_mean ] |> DataFrame
 
@@ -145,8 +149,7 @@ adjusted = [
             
 # Formel 3
 EN_sum = mean(collect(values(N_sum)))
-adjusted[:,:Sadj2020] = ( adjusted.D ./ adjusted.N ) .* adjusted.marginalP * EN_sum
-adjusted[:,:Sadj] = ( adjusted.D ./ adjusted.N ) .* adjusted.marginalP .* [ N_sum[j] for j in adjusted.jahr ]
+adjusted[:,:Dadj] = ( adjusted.D ./ adjusted.N ) .* adjusted.marginalP * EN_sum
 
 adjusted[1:2,:] |> println
 ```
@@ -158,8 +161,7 @@ adjusted[1:2,:] |> println
 adjusted[:,:cell] = collect(zip(adjusted.jahr, adjusted.kw))
 plot_data = combine(groupby(adjusted,:cell),
     :D => sum,
-    :Sadj => sum,
-    :Sadj2020 => sum)
+    :Dadj => sum)
 plot_data[:,:Jahr] = [ x[1] for x in plot_data[:,1] ]
 plot_data[:,:kw] = [ x[2] for x in plot_data[:,1] ];
 plot_data = plot_data[plot_data.kw .<= 52,:]
@@ -173,18 +175,18 @@ yticks = 0:5000:30000
     palette=lcolors, 
     xlabel="Kalenderwoche",
     title="Wöchentliche Sterbefallzahlen in Deutschland",
-	xlims=(1,52),
+	left_margin=50px,
     ylims=(0,32000), yticks=yticks, yformatter=:plain,
     legend=:bottomright
 )
 savefig(joinpath(@OUTPUT, "deaths.svg")) # hide
 
 
-@df plot_data plot(:kw, :Sadj2020_sum, group=:Jahr;lw=3,
+@df plot_data plot(:kw, :Dadj_sum, group=:Jahr;lw=3,
     palette=lcolors, 
     xlabel="Kalenderwoche",
     title="Adjustierte (2020) Sterbefallzahlen in Deutschland",
-	xlims=(1,52),
+	left_margin=50px,
     ylims=(0,32000), yticks=yticks, yformatter=:plain,
     legend=:bottomright
 )
@@ -194,13 +196,13 @@ savefig(joinpath(@OUTPUT, "adjusted_deaths.svg")) # hide
 # select(srd,tuple(:D, :expected))
 expected_deaths = combine(groupby(plot_data,:Jahr), 
     :D_sum => sum, 
-    :Sadj_sum => sum, 
-    :Sadj2020_sum => sum)
+    :Dadj_sum => sum)
 # Nicht korrigierte Rohdaten
 @df expected_deaths plot(:Jahr,:D_sum_sum; label="data", lw=3,
+	yformatter=:plain,
+	left_margin=50px,
     legend=:bottomright)
-@df expected_deaths plot!(:Jahr,:Sadj_sum_sum; label="age-sex adjusted", lw=3)
-plt = @df expected_deaths plot!(:Jahr,:Sadj2020_sum_sum; label="age-sex adjusted 2020", lw=3)
+@df expected_deaths plot!(:Jahr,:Dadj_sum_sum; label="age-sex adjusted", lw=3)
 
 savefig(joinpath(@OUTPUT, "adjusted_deaths_years.svg")) # hide
 #fdplotly(json(plt)) # hide
