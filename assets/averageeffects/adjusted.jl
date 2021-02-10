@@ -13,7 +13,6 @@ adjusted = [
             
 # Formel 3
 EN_sum = mean(collect(values(N_sum)))
-adjusted[:,:Sadj2020] = ( adjusted.D ./ adjusted.N ) .* adjusted.marginalP * EN_sum
-adjusted[:,:Sadj] = ( adjusted.D ./ adjusted.N ) .* adjusted.marginalP .* [ N_sum[j] for j in adjusted.jahr ]
+adjusted[:,:Dadj] = ( adjusted.D ./ adjusted.N ) .* adjusted.marginalP * EN_sum
 
 adjusted[1:2,:] |> println
