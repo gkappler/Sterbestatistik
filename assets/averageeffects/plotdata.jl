@@ -1,7 +1,7 @@
 # This file was generated, do not modify it. # hide
 # hideall
-adjusted[:,:cell] = collect(zip(adjusted.jahr, adjusted.kw))
-plot_data = combine(groupby(adjusted,:cell),
+moda[:,:cell] = collect(zip(moda.jahr, moda.kw))
+plot_data = combine(groupby(moda,:cell),
     :D => sum,
     :Dadj => sum)
 plot_data[:,:Jahr] = [ x[1] for x in plot_data[:,1] ]
@@ -35,7 +35,7 @@ savefig(joinpath(@OUTPUT, "deaths.svg")) # hide
 savefig(joinpath(@OUTPUT, "adjusted_deaths.svg")) # hide
 
 
-# select(srd,tuple(:D, :expected))
+# select(poda,tuple(:D, :expected))
 expected_deaths = combine(groupby(plot_data,:Jahr), 
     :D_sum => sum, 
     :Dadj_sum => sum)
@@ -44,7 +44,7 @@ expected_deaths = combine(groupby(plot_data,:Jahr),
 	yformatter=:plain,
 	left_margin=50px,
     legend=:bottomright)
-@df expected_deaths plot!(:Jahr,:Dadj_sum_sum; label="age-sex adjusted", lw=3)
+@df expected_deaths plot!(:Jahr,:Dadj_sum_sum; label="age-gender adjusted", lw=3)
 
 savefig(joinpath(@OUTPUT, "adjusted_deaths_years.svg")) # hide
 #fdplotly(json(plt)) # hide

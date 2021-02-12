@@ -2,9 +2,10 @@
 using Statistics
 using StatsPlots
 using StatsPlots.PlotMeasures
-srd[:,:P] = srd.N ./ [ N_sum[j] for j in srd.jahr ]
-srd[:,:cell] = collect(zip(srd.alter,srd.geschlecht))
-gsrd = groupby(srd, :cell)
-P_mean = Dict([ r[1] => r[2] 
-                for r in eachrow(combine(gsrd, :P=>mean))
+poda[:,:P] = poda.N ./ [ N_sum[j] for j in poda.jahr ]
+poda[:,:cell] = collect(zip(poda.alter,poda.geschlecht))
+tmp = combine(groupby(poda, :cell), 
+              :P=>mean)
+PAG_mean = Dict([ r[1] => r[2] 
+                for r in eachrow(tmp)
 			  ])

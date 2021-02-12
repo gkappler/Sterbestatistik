@@ -1,7 +1,7 @@
 # This file was generated, do not modify it. # hide
 # hideall
 tmp = [ ( A=k[1].start, G=k[2], p = 100*v/(k[1].stop-k[1].start)) 
-	    for (k,v) in P_mean ] |> DataFrame
+	    for (k,v) in PAG_mean ] |> DataFrame
 
 
 @df tmp[sortperm(tmp.A),:] plot(:A,:p, group=:G, lw=3, legend=:bottomright,
