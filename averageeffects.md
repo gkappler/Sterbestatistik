@@ -275,11 +275,16 @@ println(expected_deaths)
 ```
 \output{./total_deaths}
 
-When adjusted for age and gender, the year 2020 has the second lowest mortality (among years 2016 to 2020) in Germany.
-2020 saw 30'000-40'000 deaths less than would have been expected,
-given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020.
-Only the directly preceding year 2019 had even lower mortality
-(a fact that is notable because no catch-up effect can be observed).
+When adjusted for age and gender, the year 2020 has highest mortality (among years 2016 to 2020) in Germany,
+but does not exceed those years too much.
+
+We need to check:
+- what about week 53?
+  When removing that week, the results change drastically:
+  Only the directly preceding year 2019 had even lower mortality
+  (a fact that is notable because no catch-up effect can be observed).
+
+
 
 
 ### Sanity check: deaths per year and gender
