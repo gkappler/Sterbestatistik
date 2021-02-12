@@ -58,11 +58,11 @@ d = XLSX.readxlsx(<span class=hljs-string >&quot;data/sonderauswertung-sterbefae
         alter = <span class=hljs-number >0</span>:<span class=hljs-number >30</span>
     <span class=hljs-keyword >end</span>
     <span class=hljs-comment ># skipping 11 lines,</span>
-    zeile = <span class=hljs-number >12</span> +
+    zeile = <span class=hljs-number >11</span> +
         <span class=hljs-comment ># 16 lines blocks for years,</span>
         (<span class=hljs-number >2020</span>-jahr)*<span class=hljs-number >16</span> + 
         <span class=hljs-comment ># 5 year steps beginning age 30</span>
-        max(<span class=hljs-number >0</span>, (alter.start-<span class=hljs-number >30</span>)/<span class=hljs-number >5</span>)
+        max(<span class=hljs-number >0</span>, (alter.start-<span class=hljs-number >25</span>)/<span class=hljs-number >5</span>)
     <span class=hljs-comment >## look up gender tab</span>
     tab = d[<span class=hljs-string >&quot;D_2016_2020_KW_AG_<span class=hljs-variable >$geschlecht</span>&quot;</span>]
     <span class=hljs-comment ># and check in cw column, skipping first 3</span>
@@ -71,6 +71,6 @@ d = XLSX.readxlsx(<span class=hljs-string >&quot;data/sonderauswertung-sterbefae
 <span class=hljs-keyword >end</span></code></pre></p> <p>I am sure there is a better way to do this.</p> <p>Example tuple for testing:</p> <pre><code class="julia hljs">f(;kw=<span class=hljs-literal >missing</span>, args...) = (N=population(; args...), D=deaths(; kw=kw,args...))
 
 <span class=hljs-meta >@show</span> f(alter=<span class=hljs-number >0</span>:<span class=hljs-number >30</span>, geschlecht=<span class=hljs-string >&quot;Männlich&quot;</span>, jahr=<span class=hljs-number >2020</span>, kw=<span class=hljs-number >1</span>)
-<span class=hljs-meta >@show</span> f(alter=<span class=hljs-number >30</span>:<span class=hljs-number >35</span>, geschlecht=<span class=hljs-string >&quot;Männlich&quot;</span>, jahr=<span class=hljs-number >2020</span>)</code></pre> <pre><code class="plaintext hljs">f(alter = 0:30, geschlecht = &quot;Männlich&quot;, jahr = 2020, kw = 1) = (N = 12943028, D = 54)
+<span class=hljs-meta >@show</span> f(alter=<span class=hljs-number >30</span>:<span class=hljs-number >35</span>, geschlecht=<span class=hljs-string >&quot;Männlich&quot;</span>, jahr=<span class=hljs-number >2020</span>)</code></pre> <pre><code class="plaintext hljs">f(alter = 0:30, geschlecht = &quot;Männlich&quot;, jahr = 2020, kw = 1) = (N = 12943028, D = 84)
 f(alter = 30:35, geschlecht = &quot;Männlich&quot;, jahr = 2020) = (N = 2830265, D = 1823)
 </code></pre> <h2 id=next_steps ><a href="#next_steps">Next steps</a></h2> <p>Data preparation never feels perfect. Always keeps hurting a bit. A next steps list helps &#40;to avoid the addiction of perfect&#41;:</p> <ul> <li><p>assert correct conditioning value</p> <li><p><code>geschlecht</code>: internationalize, Symbol?</p> <li><p>all variables english?</p> </ul> <p>Let me know what you find most important, please.</p> <div class=page-foot > <div class=copyright > &copy; Dr. Gregor Kappler. Last modified: February 12, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> </div> </div> </div>
