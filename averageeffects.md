@@ -273,8 +273,9 @@ println(expected_deaths)
 ```
 \output{./total_deaths}
 
-Still, the year 2020 has the second lowest mortality when adjusted by age and gender in the years 2016 to 2020.
-More than 30'000 less deaths have been observed 2020 than would have been expected given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020.
+When adjusted for age and gender, the year 2020 has the second lowest mortality (among years 2016 to 2020).
+2020 saw 30'000-40'000 deaths less than would have been expected,
+given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020.
 Only the directly preceding year 2019 had even lower mortality
 (a fact that is notable because no catch-up effect can be observed).
 
