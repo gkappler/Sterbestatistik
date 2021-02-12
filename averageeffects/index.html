@@ -93,7 +93,7 @@ println&#40;expected_deaths&#41;</code></pre> <pre><code class=plaintext >5×8 D
    3 │  2018     952295      953776.0      951637.0    82792351   951637.0      1481.0          2139.0
    4 │  2019     936772      924822.0      933566.0    83019213   933566.0    -11950.0         -8744.0
    5 │  2020     997859      959251.0      992681.0    83166711   992681.0    -38608.0        -33430.0
-</code></pre> <p>When adjusted for age and gender, the year 2020 has the second lowest mortality &#40;among years 2016 to 2020&#41; in Germany. 2020 saw 30&#39;000-40&#39;000 deaths less than would have been expected, given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020. Only the directly preceding year 2019 had even lower mortality &#40;a fact that is notable because no catch-up effect can be observed&#41;.</p> <h3 id=sanity_check_deaths_per_year_and_gender ><a href="#sanity_check_deaths_per_year_and_gender">Sanity check: deaths per year and gender</a></h3> <pre><code class=plaintext >10×2 DataFrame
+</code></pre> <p>When adjusted for age and gender, the year 2020 has highest mortality &#40;among years 2016 to 2020&#41; in Germany, but does not exceed those years too much.</p> <p>We need to check:</p> <ul> <li><p>what about week 53? When removing that week, the results change drastically: Only the directly preceding year 2019 had even lower mortality &#40;a fact that is notable because no catch-up effect can be observed&#41;.</p> </ul> <h3 id=sanity_check_deaths_per_year_and_gender ><a href="#sanity_check_deaths_per_year_and_gender">Sanity check: deaths per year and gender</a></h3> <pre><code class=plaintext >10×2 DataFrame
  Row │ jg                  D_sum
      │ Tuple…              Int64
 ─────┼────────────────────────────
