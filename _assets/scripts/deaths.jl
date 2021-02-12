@@ -23,11 +23,11 @@ function deaths(; alter::UnitRange, geschlecht, jahr, kw=missing)
         alter = 0:30
     end
     # skipping 11 lines,
-    zeile = 12 +
+    zeile = 11 +
         # 16 lines blocks for years,
         (2020-jahr)*16 + 
         # 5 year steps beginning age 30
-        max(0, (alter.start-30)/5)
+        max(0, (alter.start-25)/5)
     ## look up gender tab
     tab = d["D_2016_2020_KW_AG_$geschlecht"]
     # and check in cw column, skipping first 3
