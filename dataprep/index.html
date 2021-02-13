@@ -1,7 +1,8 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/Sterbestatistik/libs/highlight/github.min.css"> <link rel=stylesheet  href="/Sterbestatistik/css/franklin.css"> <link rel=stylesheet  href="/Sterbestatistik/css/tufte.css"> <link rel=stylesheet  href="/Sterbestatistik/css/latex.css"> <link rel=stylesheet  href="/Sterbestatistik/css/adjust.css"> <link rel=icon  href="/Sterbestatistik/assets/favicon.png"> <title>Data preparation</title> <div id=layout > <div id=menu > <ul> <li><a href="/Sterbestatistik/">Mortalities</a> <li><a href="/Sterbestatistik/dataprep/">Preparation</a> <li><a href="/Sterbestatistik/averageeffects/">Analysis</a> <li><a href="/Sterbestatistik/reflection/">Reflection</a> </ul> </div> <div id=main > <div class=franklin-content > <p>A tutorial for <em>Scientific Data Preparation</em> with julia.</p> <h1 id=german_excess_death_2020 ><a href="#german_excess_death_2020">German Excess Death 2020? </a></h1> <p>formalizes the process of looking up the results of data function calls in data tables. Lookup needs to be expressed in terms of a programming language, here julia.</p> <p>Values need to be looked up for combinations of the following variables &#40;and calendar week&#41;: <pre><code class="julia hljs">jahre = <span class=hljs-number >2016</span>:<span class=hljs-number >2020</span>
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/Sterbestatistik/libs/highlight/github.min.css"> <link rel=stylesheet  href="/Sterbestatistik/css/franklin.css"> <link rel=stylesheet  href="/Sterbestatistik/css/tufte.css"> <link rel=stylesheet  href="/Sterbestatistik/css/latex.css"> <link rel=stylesheet  href="/Sterbestatistik/css/adjust.css"> <link rel=icon  href="/Sterbestatistik/assets/favicon.png"> <title>Data preparation</title> <div id=layout > <div id=menu > <ul> <li><a href="/Sterbestatistik/">Mortalities</a> <li><a href="/Sterbestatistik/dataprep/">Preparation</a> <li><a href="/Sterbestatistik/population/">Population</a> <li><a href="/Sterbestatistik/averageeffects_months/">Adjusted Months</a> <li><a href="/Sterbestatistik/averageeffects/">Analysis Weeks</a> <li><a href="/Sterbestatistik/reflection/">Reflection</a> </ul> </div> <div id=main > <div class=franklin-content > <p>A tutorial for <em>Scientific Data Preparation</em> with julia.</p> <h1 id=german_excess_death_2020 ><a href="#german_excess_death_2020">German Excess Death 2020? </a></h1> <p>formalizes the process of looking up the results of data function calls in data tables. Lookup needs to be expressed in terms of a programming language, here julia.</p> <p>Values need to be looked up for combinations of the following variables &#40;and calendar week&#41;: <pre><code class="julia hljs">jahre = <span class=hljs-number >2016</span>:<span class=hljs-number >2020</span>
 geschlechter = [<span class=hljs-string >&quot;Männlich&quot;</span>, <span class=hljs-string >&quot;Weiblich&quot;</span>] <span class=hljs-comment ># , &quot;Insgesamt&quot;</span>
 MAX=<span class=hljs-number >200</span>
-altersgruppen = [ <span class=hljs-number >0</span>:<span class=hljs-number >30</span>, [a:a+<span class=hljs-number >5</span> <span class=hljs-keyword >for</span> a <span class=hljs-keyword >in</span> <span class=hljs-number >30</span>:<span class=hljs-number >5</span>:<span class=hljs-number >80</span>]..., <span class=hljs-number >85</span>:MAX ];</code></pre></p> <p>As a human, I can lookup conveniently in the excel tables, but the comma separates values are tedious. What julia code is more simple?</p> <h3 id=population ><a href="#population">Population</a></h3> <p>The comma separated values &#40;CSV&#41; file would e.g. be loaded, trimmed and parsed <pre><code class="julia hljs"><span class=hljs-keyword >using</span> CSV, DataFrames, StringEncodings
+altersgruppen_kw = [ <span class=hljs-number >0</span>:<span class=hljs-number >30</span>, [a:a+<span class=hljs-number >5</span> <span class=hljs-keyword >for</span> a <span class=hljs-keyword >in</span> <span class=hljs-number >30</span>:<span class=hljs-number >5</span>:<span class=hljs-number >80</span>]..., <span class=hljs-number >85</span>:MAX ];
+altersgruppen_months = [ <span class=hljs-number >0</span>:<span class=hljs-number >15</span>, <span class=hljs-number >15</span>:<span class=hljs-number >30</span>, [a:a+<span class=hljs-number >5</span> <span class=hljs-keyword >for</span> a <span class=hljs-keyword >in</span> <span class=hljs-number >30</span>:<span class=hljs-number >5</span>:<span class=hljs-number >80</span>]..., <span class=hljs-number >85</span>:MAX ];</code></pre></p> <p>As a human, I can lookup conveniently in the excel tables, but the comma separates values are tedious. What julia code is more simple?</p> <h3 id=population ><a href="#population">Population</a></h3> <p>The comma separated values &#40;CSV&#41; file would e.g. be loaded, trimmed and parsed <pre><code class="julia hljs"><span class=hljs-keyword >using</span> CSV, DataFrames, StringEncodings
 
 p = CSV.File(
     open(read, <span class=hljs-string >&quot;data/12411-0006.csv&quot;</span>, <span class=hljs-string >enc&quot;ISO-8859-1&quot;</span>);
@@ -33,44 +34,103 @@ iseq(x,y) = [ e.start &gt;= y.start &amp;&amp; e.stop &lt; y.stop
     rows = (p[:,<span class=hljs-number >1</span>] .== Date(jahr-<span class=hljs-number >1</span>,<span class=hljs-number >12</span>,<span class=hljs-number >31</span>)) .&amp;
         iseq(p[:,<span class=hljs-number >2</span>], alter)
     sum(p[rows, geschlecht])
+<span class=hljs-keyword >end</span>
+
+
+
+poda = [ 
+  ( alter = a,
+    geschlecht=g, 
+    jahr=j,
+    N=population(alter=a, geschlecht=g, jahr=j)
+<span class=hljs-comment >#    D=deaths(alter=a, geschlecht=g, jahr=j)</span>
+  )
+  <span class=hljs-keyword >for</span> a <span class=hljs-keyword >in</span> altersgruppen
+  <span class=hljs-keyword >for</span> g <span class=hljs-keyword >in</span> geschlechter
+  <span class=hljs-keyword >for</span> j <span class=hljs-keyword >in</span> jahre 
+  ] |&gt; DataFrame;
+
+
+
+N_sum = <span class=hljs-built_in >Dict</span>(
+   r[<span class=hljs-number >1</span>] =&gt; r[<span class=hljs-number >2</span>] 
+   <span class=hljs-keyword >for</span> r <span class=hljs-keyword >in</span> eachrow(
+              combine(groupby(poda, :jahr), 
+                      :N=&gt;sum)))
+
+
+<span class=hljs-keyword >using</span> Statistics
+<span class=hljs-keyword >using</span> StatsPlots
+<span class=hljs-keyword >using</span> StatsPlots.PlotMeasures
+poda[:,:P] = poda.N ./ [ N_sum[j] <span class=hljs-keyword >for</span> j <span class=hljs-keyword >in</span> poda.jahr ]
+poda[:,:cell] = collect(zip(poda.alter,poda.geschlecht))
+
+PAG_mean = <span class=hljs-keyword >let</span> tmp = combine(groupby(poda, :cell), 
+                  :P=&gt;mean)
+    <span class=hljs-built_in >Dict</span>([ r[<span class=hljs-number >1</span>] =&gt; r[<span class=hljs-number >2</span>] 
+           <span class=hljs-keyword >for</span> r <span class=hljs-keyword >in</span> eachrow(tmp)
+	   ])
 <span class=hljs-keyword >end</span></code></pre></p> <p>This is not too painful and straight forward. The aggregation with <code>UnitRange</code> is convenient but can be further improved.</p> <h3 id=deaths_statistics_xlsx ><a href="#deaths_statistics_xlsx">Deaths statistics &#40;XLSX&#41;</a></h3> <p>But now with the excel it is funny. <pre><code class="julia hljs"><span class=hljs-keyword >using</span> XLSX
 d = XLSX.readxlsx(<span class=hljs-string >&quot;data/sonderauswertung-sterbefaelle.xlsx&quot;</span>)
-<span class=hljs-keyword >function</span> deaths(; alter::<span class=hljs-built_in >UnitRange</span>, geschlecht, jahr, kw=<span class=hljs-literal >missing</span>)
-	<span class=hljs-keyword >if</span> kw === <span class=hljs-literal >missing</span>
-		<span class=hljs-keyword >return</span> sum(<span class=hljs-built_in >Int</span>[ deaths(;alter=alter,geschlecht=geschlecht, jahr=jahr,kw=i)
-             <span class=hljs-keyword >for</span> i <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:<span class=hljs-number >53</span>
-             <span class=hljs-keyword >if</span> deaths(;alter=alter,geschlecht=geschlecht, jahr=jahr, kw=i) <span class=hljs-keyword >isa</span> <span class=hljs-built_in >Integer</span>])
-			 
-	<span class=hljs-keyword >end</span>
+<span class=hljs-keyword >function</span> deaths(; alter::<span class=hljs-built_in >UnitRange</span>, geschlecht, jahr, kw=<span class=hljs-literal >missing</span>, month=<span class=hljs-literal >missing</span>)
     <span class=hljs-meta >@assert</span> geschlecht <span class=hljs-keyword >in</span> geschlechter
     <span class=hljs-keyword >if</span> alter==<span class=hljs-number >85</span>:MAX
-        <span class=hljs-keyword >return</span> deaths(;alter=<span class=hljs-number >85</span>:<span class=hljs-number >90</span>,geschlecht=geschlecht, jahr=jahr, kw=kw)+
-            deaths(;alter=<span class=hljs-number >90</span>:<span class=hljs-number >95</span>,geschlecht=geschlecht, jahr=jahr, kw=kw)+
-            deaths(;alter=<span class=hljs-number >95</span>:MAX,geschlecht=geschlecht, jahr=jahr, kw=kw)
+        <span class=hljs-keyword >return</span> deaths(;alter=<span class=hljs-number >85</span>:<span class=hljs-number >90</span>,geschlecht=geschlecht, jahr=jahr, kw=kw, month=month)+
+            deaths(;alter=<span class=hljs-number >90</span>:<span class=hljs-number >95</span>,geschlecht=geschlecht, jahr=jahr, kw=kw, month=month)+
+            deaths(;alter=<span class=hljs-number >95</span>:MAX,geschlecht=geschlecht, jahr=jahr, kw=kw, month=month)
     <span class=hljs-keyword >end</span>
-    <span class=hljs-comment ># @assert alter isa UnitRange &amp;&amp; alter.stop-alter.start==5 &amp;&amp; alter.start&lt;=95</span>
-    <span class=hljs-keyword >if</span> alter.start &gt;= <span class=hljs-number >95</span>
-		<span class=hljs-comment >#@warn &quot;alter&quot; alter</span>
-        alter = <span class=hljs-number >95</span>:MAX
-    <span class=hljs-keyword >end</span>    
-    <span class=hljs-keyword >if</span> alter.stop &lt;= <span class=hljs-number >30</span>
-		<span class=hljs-comment >#@warn &quot;alter&quot; alter</span>
-        alter = <span class=hljs-number >0</span>:<span class=hljs-number >30</span>
-    <span class=hljs-keyword >end</span>
-    <span class=hljs-comment ># skipping 11 lines,</span>
-    zeile = <span class=hljs-number >11</span> +
-        <span class=hljs-comment ># 16 lines blocks for years,</span>
-        (<span class=hljs-number >2020</span>-jahr)*<span class=hljs-number >16</span> + 
-        <span class=hljs-comment ># 5 year steps beginning age 30</span>
-        max(<span class=hljs-number >0</span>, (alter.start-<span class=hljs-number >25</span>)/<span class=hljs-number >5</span>)
-    <span class=hljs-comment >## look up gender tab</span>
-    tab = d[<span class=hljs-string >&quot;D_2016_2020_KW_AG_<span class=hljs-variable >$geschlecht</span>&quot;</span>]
-    <span class=hljs-comment ># and check in cw column, skipping first 3</span>
-    r = tab[convert(<span class=hljs-built_in >Int</span>,zeile), kw+<span class=hljs-number >3</span>]
+    <span class=hljs-keyword >if</span> kw === <span class=hljs-literal >missing</span>
+        <span class=hljs-keyword >if</span> month === <span class=hljs-literal >missing</span> 
+	    <span class=hljs-keyword >return</span> sum(<span class=hljs-built_in >Int</span>[ deaths(;alter=alter,geschlecht=geschlecht, jahr=jahr, month=i)
+                            <span class=hljs-keyword >for</span> i <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:<span class=hljs-number >12</span>
+                            <span class=hljs-keyword >if</span> deaths(;alter=alter,geschlecht=geschlecht, jahr=jahr, kw=i) <span class=hljs-keyword >isa</span> <span class=hljs-built_in >Integer</span>])
+        <span class=hljs-keyword >else</span>
+            <span class=hljs-comment ># skipping 11 lines,</span>
+            zeile = <span class=hljs-number >11</span> +
+                <span class=hljs-comment ># 16 lines blocks for years,</span>
+                (<span class=hljs-number >2020</span>-jahr)*<span class=hljs-number >17</span> + 
+                <span class=hljs-comment ># 5 year steps beginning age 30</span>
+                <span class=hljs-keyword >if</span> alter.start == <span class=hljs-number >0</span>
+                    <span class=hljs-number >0</span>
+                <span class=hljs-keyword >elseif</span> alter.start == <span class=hljs-number >15</span>
+                    <span class=hljs-number >1</span>
+                <span class=hljs-keyword >else</span>
+                    <span class=hljs-number >1</span> + max(<span class=hljs-number >0</span>, (alter.start-<span class=hljs-number >25</span>)/<span class=hljs-number >5</span>)
+                <span class=hljs-keyword >end</span>
+            <span class=hljs-comment >## look up gender tab</span>
+            tab = d[<span class=hljs-string >&quot;D_2016-2020_Monate_AG_<span class=hljs-variable >$geschlecht</span>&quot;</span>]
+            <span class=hljs-comment ># and check in cw column, skipping first 3</span>
+            r = tab[convert(<span class=hljs-built_in >Int</span>,zeile), month+<span class=hljs-number >3</span>]
+	    r <span class=hljs-keyword >isa</span> <span class=hljs-built_in >Integer</span> ? r : <span class=hljs-number >0</span>
+	<span class=hljs-keyword >end</span>
+    <span class=hljs-keyword >else</span>
+        <span class=hljs-keyword >if</span> month !== <span class=hljs-literal >missing</span>
+            error(<span class=hljs-string >&quot;proveide either month or calendar week, but not both&quot;</span>)
+        <span class=hljs-keyword >end</span>
+        <span class=hljs-comment ># @assert alter isa UnitRange &amp;&amp; alter.stop-alter.start==5 &amp;&amp; alter.start&lt;=95</span>
+        <span class=hljs-keyword >if</span> alter.start &gt;= <span class=hljs-number >95</span>
+	    <span class=hljs-comment >#@warn &quot;alter&quot; alter</span>
+            alter = <span class=hljs-number >95</span>:MAX
+        <span class=hljs-keyword >end</span>    
+        <span class=hljs-keyword >if</span> alter.stop &lt;= <span class=hljs-number >30</span>
+	    <span class=hljs-comment >#@warn &quot;alter&quot; alter</span>
+            alter = <span class=hljs-number >0</span>:<span class=hljs-number >30</span>
+        <span class=hljs-keyword >end</span>
+        <span class=hljs-comment ># skipping 11 lines,</span>
+        zeile = <span class=hljs-number >11</span> +
+            <span class=hljs-comment ># 16 lines blocks for years,</span>
+            (<span class=hljs-number >2020</span>-jahr)*<span class=hljs-number >16</span> + 
+            <span class=hljs-comment ># 5 year steps beginning age 30</span>
+            max(<span class=hljs-number >0</span>, (alter.start-<span class=hljs-number >25</span>)/<span class=hljs-number >5</span>)
+        <span class=hljs-comment >## look up gender tab</span>
+        tab = d[<span class=hljs-string >&quot;D_2016_2020_KW_AG_<span class=hljs-variable >$geschlecht</span>&quot;</span>]
+        <span class=hljs-comment ># and check in cw column, skipping first 3</span>
+        r = tab[convert(<span class=hljs-built_in >Int</span>,zeile), kw+<span class=hljs-number >3</span>]
 	r <span class=hljs-keyword >isa</span> <span class=hljs-built_in >Integer</span> ? r : <span class=hljs-number >0</span>
+    <span class=hljs-keyword >end</span>
 <span class=hljs-keyword >end</span></code></pre></p> <p>I am sure there is a better way to do this.</p> <p>Example tuple for testing:</p> <pre><code class="julia hljs">f(;kw=<span class=hljs-literal >missing</span>, args...) = (N=population(; args...), D=deaths(; kw=kw,args...))
 
 <span class=hljs-meta >@show</span> f(alter=<span class=hljs-number >0</span>:<span class=hljs-number >30</span>, geschlecht=<span class=hljs-string >&quot;Männlich&quot;</span>, jahr=<span class=hljs-number >2020</span>, kw=<span class=hljs-number >1</span>)
-<span class=hljs-meta >@show</span> f(alter=<span class=hljs-number >30</span>:<span class=hljs-number >35</span>, geschlecht=<span class=hljs-string >&quot;Männlich&quot;</span>, jahr=<span class=hljs-number >2020</span>)</code></pre> <pre><code class="plaintext hljs">f(alter = 0:30, geschlecht = &quot;Männlich&quot;, jahr = 2020, kw = 1) = (N = 12943028, D = 84)
-f(alter = 30:35, geschlecht = &quot;Männlich&quot;, jahr = 2020) = (N = 2830265, D = 1823)
-</code></pre> <h2 id=next_steps ><a href="#next_steps">Next steps</a></h2> <p>Data preparation never feels perfect. Always keeps hurting a bit. A next steps list helps &#40;to avoid the addiction of perfect&#41;:</p> <ul> <li><p>assert correct conditioning value</p> <li><p><code>geschlecht</code>: internationalize, Symbol?</p> <li><p>all variables english?</p> </ul> <p>Let me know what you find most important, please.</p> <div class=page-foot > <div class=copyright > &copy; Dr. Gregor Kappler. Last modified: February 12, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> </div> </div> </div>
+<span class=hljs-meta >@show</span> f(alter=<span class=hljs-number >30</span>:<span class=hljs-number >35</span>, geschlecht=<span class=hljs-string >&quot;Männlich&quot;</span>, jahr=<span class=hljs-number >2020</span>)</code></pre> <pre><code class="plaintext hljs">LoadError: UndefVarError: altersgruppen not defined
+in expression starting at /home/runner/work/Sterbestatistik/Sterbestatistik/_assets/scripts/population.jl:37
+</code></pre> <h2 id=next_steps ><a href="#next_steps">Next steps</a></h2> <p>Data preparation never feels perfect. Always keeps hurting a bit. A next steps list helps &#40;to avoid the addiction of perfect&#41;:</p> <ul> <li><p>assert correct conditioning value</p> <li><p><code>geschlecht</code>: internationalize, Symbol?</p> <li><p>all variables english?</p> </ul> <p>Let me know what you find most important, please.</p> <div class=page-foot > <div class=copyright > &copy; Dr. Gregor Kappler. Last modified: February 13, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> </div> </div> </div>

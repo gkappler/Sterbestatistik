@@ -1,0 +1,6 @@
+2×8 DataFrame
+ Row │ jahr   alter      geschlecht  month  N        D      marginalP  Dadj
+     │ Int64  UnitRang…  String      Int64  Int64    Int64  Float64    Float64
+─────┼─────────────────────────────────────────────────────────────────────────
+   1 │  2016  0:15       Männlich        1  5594051    171  0.069294     175.0
+   2 │  2016  15:30      Männlich        1  7386753    256  0.0878448    252.0
