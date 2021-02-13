@@ -1,127 +1,42 @@
-<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/Sterbestatistik/libs/katex/katex.min.css"> <link rel=stylesheet  href="/Sterbestatistik/libs/highlight/github.min.css"> <script src="/Sterbestatistik/libs/plotly/plotly.min.js"></script> <link rel=stylesheet  href="/Sterbestatistik/css/franklin.css"> <link rel=stylesheet  href="/Sterbestatistik/css/tufte.css"> <link rel=stylesheet  href="/Sterbestatistik/css/latex.css"> <link rel=stylesheet  href="/Sterbestatistik/css/adjust.css"> <link rel=icon  href="/Sterbestatistik/assets/favicon.png"> <title>Adjusted Weekly Mortality</title> <div id=layout > <div id=menu > <ul> <li><a href="/Sterbestatistik/">Mortalities</a> <li><a href="/Sterbestatistik/dataprep/">Preparation</a> <li><a href="/Sterbestatistik/population/">Population</a> <li><a href="/Sterbestatistik/averageeffects_months/">Adjusted Months</a> <li><a href="/Sterbestatistik/averageeffects/">Analysis Weeks</a> <li><a href="/Sterbestatistik/reflection/">Reflection</a> </ul> </div> <div id=main > <div class=franklin-content > <p>Adjusting mortalities for age and gender for an unbiased comparisons in an aging society.</p> <h1 id=german_excess_death_2020 ><a href="#german_excess_death_2020">German Excess Death 2020? </a></h1> <h2 id=collecting_values_in_a_table ><a href="#collecting_values_in_a_table">Collecting values in a table</a></h2> <p>The lookup functions <code>population</code> are used in a multi-dimensional julia comprehension <code>&#91;f&#40;...&#41; for ...&#93;</code> and converted to a <code>DataFrame</code> <code>poda</code> &#40;abbrev. population data&#41;.</p> <pre><code class=language-julia >altersgruppen &#61; altersgruppen_months</code></pre>
-<p>The data is comprised of rows like for the <code>0:30</code> age group: <pre><code class=plaintext >10×6 DataFrame
- Row │ alter      geschlecht  jahr   N        P          cell
-     │ UnitRang…  String      Int64  Int64    Float64    Tuple…
-─────┼──────────────────────────────────────────────────────────────────────
-   1 │ 0:15       Männlich     2016  5594051  0.0680743  (0:15, "Männlich")
-   2 │ 0:15       Männlich     2017  5679300  0.0688219  (0:15, "Männlich")
-   3 │ 0:15       Männlich     2018  5740895  0.0693409  (0:15, "Männlich")
-   4 │ 0:15       Männlich     2019  5800702  0.0698718  (0:15, "Männlich")
-   5 │ 0:15       Männlich     2020  5851703  0.0703611  (0:15, "Männlich")
-   6 │ 0:15       Weiblich     2016  5287075  0.0643387  (0:15, "Weiblich")
-   7 │ 0:15       Weiblich     2017  5369268  0.065065   (0:15, "Weiblich")
-   8 │ 0:15       Weiblich     2018  5430864  0.0655962  (0:15, "Weiblich")
-   9 │ 0:15       Weiblich     2019  5490113  0.0661306  (0:15, "Weiblich")
-  10 │ 0:15       Weiblich     2020  5539556  0.0666079  (0:15, "Weiblich")
-</code></pre></p>
+<!doctype html> <html lang=en > <meta charset=UTF-8 > <meta name=viewport  content="width=device-width, initial-scale=1"> <link rel=stylesheet  href="/Sterbestatistik/libs/katex/katex.min.css"> <link rel=stylesheet  href="/Sterbestatistik/libs/highlight/github.min.css"> <script src="/Sterbestatistik/libs/plotly/plotly.min.js"></script> <link rel=stylesheet  href="/Sterbestatistik/css/franklin.css"> <link rel=stylesheet  href="/Sterbestatistik/css/tufte.css"> <link rel=stylesheet  href="/Sterbestatistik/css/latex.css"> <link rel=stylesheet  href="/Sterbestatistik/css/adjust.css"> <link rel=icon  href="/Sterbestatistik/assets/favicon.png"> <title>Adjusted Weekly Mortality</title> <div id=layout > <div id=menu > <ul> <li><a href="/Sterbestatistik/">Mortalities</a> <li><a href="/Sterbestatistik/dataprep/">Preparation</a> <li><a href="/Sterbestatistik/population/">Population</a> <li><a href="/Sterbestatistik/averageeffects_months/">Adjusted</a> <li><a href="/Sterbestatistik/averageeffects/">Weekly</a> <li><a href="/Sterbestatistik/reflection/">Reflection</a> </ul> </div> <div id=main > <div class=franklin-content > <p>Adjusting mortalities for age and gender for an unbiased comparisons in an aging society.</p> <h1 id=german_excess_death_2020 ><a href="#german_excess_death_2020">German Excess Death 2020? </a></h1> <h3 id=adjusted_data ><a href="#adjusted_data">Adjusted data</a></h3> <p>For adjustment, age and gender specific mortality is estimated for each calendar week, from <code>population</code> as well as <code>deaths</code> data, and adjusted according to the formula above, converted to a <code>DataFrame</code> <code>moda</code> &#40;abbrev. mortality data&#41;.</p> <pre><code class="julia hljs">moda = [
+    ( jahr=j, alter=a, geschlecht=g,
+      month=m,
+      N = population(jahr=j,alter=a,geschlecht=g),
+      D = deaths(jahr=j, alter=a, geschlecht=g, month=m),
+      marginalP = PAG_mean[ (a,g) ]
+    )
+    <span class=hljs-keyword >for</span> a <span class=hljs-keyword >in</span> altersgruppen_months, 
+        m <span class=hljs-keyword >in</span> <span class=hljs-number >1</span>:<span class=hljs-number >12</span>, 
+        g <span class=hljs-keyword >in</span> geschlechter,
+        j <span class=hljs-keyword >in</span> jahre
+    <span class=hljs-keyword >if</span> deaths(jahr=j,alter=a,geschlecht=g,month=m) <span class=hljs-keyword >isa</span> <span class=hljs-built_in >Int</span>
+	] |&gt; DataFrame
 
-<h2 id=random_variables ><a href="#random_variables">Random Variables</a></h2>
-<p>are the strict formulations in probability theory, for scientific notation.</p>
-<h3 id=conditioning_variables ><a href="#conditioning_variables">Conditioning Variables:</a></h3>
-<ul>
-<li><p>Jahre/years \(J: \Omega \rightarrow \{2016,\ldots,2020\}\)</p>
+<span class=hljs-comment ># Formel 3</span>
+EN_sum = mean(collect(values(N_sum)))
+moda[:,:Dadj] = round.(( moda.D ./ moda.N ) .* moda.marginalP * EN_sum)
 
-<li><p>Months: \(M: \Omega \rightarrow \{1, \ldots, 12\}\)</p>
-
-<li><p>Geschlechter/Gender \(G: \Omega \rightarrow \{Männlich, Weiblich\}\)</p>
-
-<li><p>altersgruppen, age: \(A: \Omega \rightarrow \{&#91;0,15&#91;, &#91;15,30&#91;, &#91;30,35&#91;, &#91;35,40&#91;, &#91;40,45&#91;, &#91;45,50&#91;, &#91;50,55&#91;, &#91;55,60&#91;, &#91;60,65&#91;, &#91;65,70&#91;, &#91;70,75&#91;, &#91;75,80&#91;, &#91;80,85&#91;, &#91;85,200&#91;\}\)</p>
-
-</ul>
-<h3 id=observables ><a href="#observables">Observables:</a></h3>
-<ul>
-<li><p>Deaths are observed \(D | J,M,G,A: \Omega \rightarrow \mathbb{N}\)</p>
-
-<li><p>Population \(N |J,G,A: \Omega \rightarrow \mathbb{N}\)</p>
-
-</ul>
-<p>Note: death statistics are observed for each month &#40;as well as year, gender, age&#41;,  but population statistics are observed only for combinations of year, gender, and age.</p>
-<h2 id=probabilities_and_adjusted_expectations ><a href="#probabilities_and_adjusted_expectations">Probabilities and adjusted Expectations</a></h2>
-<p>Death counts at month \(J=j, M=m\) can be adjusted for</p>
-<ul>
-<li><p>\(P(A=a, G=g)\): average joint distribution of age and gender, </p>
-
-<li><p>\(E(N)\): average population count,</p>
-
-</ul>
-<p>both averaged accross all observed years.</p>
-\(E^{adj}(D | J=j, M=m) =\)
-\[
-\sum_{a,g \in A, G} \left[ 
-	\underbrace{E\left( \frac{D}{N} | A=a, G=g, J=j, M=m \right)}_{A \times G\text{ mortality rates}}
-	\underbrace{P(A=a, G=g)}_{\text{average} A \times G\text{ distribution}} 
-  \right]
-  	\underbrace{E(N)}_{\text{average population count}},
-\]
-\(\forall j \in \{2016,\ldots,2020\}, w \in \{1,\ldots,12\}\)
-<h3 id=notes_regarding_notation_photo_rolf ><a href="#notes_regarding_notation_photo_rolf">Notes regarding Notation &#40;Photo Rolf&#41;</a></h3>
-<p>were expanded with \(M\) for month number.</p>
-<h4 id=formel_1 ><a href="#formel_1">Formel &#40;1&#41;</a></h4>
-\[
-P^{2016}( I_+=1 | G=g, A=a) = E\left[\frac{D}{N} | A=a, G=g, J=2016, M=m \right]
-\]
-<h4 id=formel_2 ><a href="#formel_2">Formel &#40;2&#41;</a></h4>
-\[
-P^{2020}_{adj}( + ) = E^{adj}(D | J, M) / E(N)
-\]
-<h4 id=formel_3 ><a href="#formel_3">Formel &#40;3&#41;</a></h4>
-\[
-P(A=a, G=g)
-\]
-<h3 id=adjusted_data ><a href="#adjusted_data">Adjusted data</a></h3>
-<p>For adjustment, age and gender specific mortality is estimated for each calendar week,  from <code>population</code> as well as <code>deaths</code> data, and adjusted according to the formula above, converted to a <code>DataFrame</code> <code>moda</code> &#40;abbrev. mortality data&#41;.</p>
-<pre><code class=language-julia >moda &#61; &#91;
-    &#40; jahr&#61;j, alter&#61;a, geschlecht&#61;g,
-      month&#61;m,
-      N &#61; population&#40;jahr&#61;j,alter&#61;a,geschlecht&#61;g&#41;,
-      D &#61; deaths&#40;jahr&#61;j, alter&#61;a, geschlecht&#61;g, month&#61;m&#41;,
-      marginalP &#61; PAG_mean&#91; &#40;a,g&#41; &#93;
-    &#41;
-    for a in altersgruppen_months, 
-        m in 1:12, 
-        g in geschlechter,
-        j in jahre
-    if deaths&#40;jahr&#61;j,alter&#61;a,geschlecht&#61;g,month&#61;m&#41; isa Int
-	&#93; |&gt; DataFrame
-
-# Formel 3
-EN_sum &#61; mean&#40;collect&#40;values&#40;N_sum&#41;&#41;&#41;
-moda&#91;:,:Dadj&#93; &#61; round.&#40;&#40; moda.D ./ moda.N &#41; .* moda.marginalP * EN_sum&#41;
-
-moda&#91;1:2,:&#93; |&gt; println</code></pre>
-<pre><code class=plaintext >2×8 DataFrame
+moda[<span class=hljs-number >1</span>:<span class=hljs-number >2</span>,:] |&gt; println</code></pre> <pre><code class="plaintext hljs">2×8 DataFrame
  Row │ jahr   alter      geschlecht  month  N        D      marginalP  Dadj
      │ Int64  UnitRang…  String      Int64  Int64    Int64  Float64    Float64
 ─────┼─────────────────────────────────────────────────────────────────────────
    1 │  2016  0:15       Männlich        1  5594051    171  0.069294     175.0
    2 │  2016  15:30      Männlich        1  7386753    256  0.0878448    252.0
-</code></pre>
-
-<h2 id=reproduction_of_data-visualisation_of_the_statistisches_bundesamt ><a href="#reproduction_of_data-visualisation_of_the_statistisches_bundesamt">Reproduction of Data-Visualisation of the <em>Statistisches Bundesamt</em></a></h2>
-<p><a href="https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Sterbefaelle-Lebenserwartung/sterbefallzahlen.html">Official mortality analysis</a> shows a graph of weekly mortalityfrom 2016-2020.</p>
-<p>Our reproduction seems identical: <img src="/Sterbestatistik/assets/averageeffects_months/output/deaths.svg" alt=""></p>
-<p>The age- and gender-adjusted mortality counts in 2020 are low until autumn. The mortality increase in Winter 2020 is less pronounced than when looking at values  biased by the confounders from an aging society.</p>
-<img src="/Sterbestatistik/assets/averageeffects_months/output/adjusted_deaths.svg" alt="">
-<h3 id=year_aggregated_mortality ><a href="#year_aggregated_mortality">Year aggregated mortality</a></h3>
-<p>Summing weekly mortality results in the total count of deceased persons in the given year, in total numbers, as well as adjusted by age and gender.</p>
-<img src="/Sterbestatistik/assets/averageeffects_months/output/adjusted_deaths_years.svg" alt="">
-<p>Yet, comparing these numbers unadjusted &#40;<code>difference</code>&#41; again is not fair, considering the population growth from 2016 to 2020: <code>D_sum_sum</code> is the &quot;data&quot;, <code>Dadj_sum_sum</code> is the &quot;age-gender-adjusted&quot; curve above. <code>D_pop_adj</code> is the mortality adjusted to the assumption that all years had fixed population \(E(N)\) used in the adjustment formula.</p>
-<pre><code class=language-julia >D_2016_2021_Tage &#61; Dict&#40; j &#61;&gt; d 
-	for &#40;j,d&#41; in zip&#40;&#40;2020,2019,2018, 2017, 2016&#41;, 
-	                 &#40;982489,  939520,  954874,  932263,  910899&#41;&#41;&#41;
-expected_deaths&#91;:,:totalxls&#93; &#61; 
-	&#91; D_2016_2021_Tage&#91;j&#93; for j in expected_deaths.Jahr &#93;
-expected_deaths&#91;:,:Population&#93; &#61; 
-	&#91; N_sum&#91;j&#93; for j in expected_deaths.Jahr &#93;
-expected_deaths&#91;:,:D_pop_adj&#93; &#61; 
-	round.&#40;EN_sum * expected_deaths.D_sum_sum ./ expected_deaths.Population &#41;
-expected_deaths&#91;:,:difference&#93; &#61; 
+</code></pre> <h2 id=reproduction_of_data-visualisation_of_the_statistisches_bundesamt ><a href="#reproduction_of_data-visualisation_of_the_statistisches_bundesamt">Reproduction of Data-Visualisation of the <em>Statistisches Bundesamt</em></a></h2> <p>See also the weekly mortality from 2016-2020 <a href="/Sterbestatistik/averageeffects/#reproduction_of_data-visualisation_of_the_statistisches_bundesamt">comparison with official plotting</a>.</p> <img src="/Sterbestatistik/assets/averageeffects_months/output/deaths.svg" alt=""> <p>In an aging society the actual mortality counts are biased.</p> <img src="/Sterbestatistik/assets/averageeffects_months/output/adjusted_deaths.svg" alt=""> <p>The age- and gender-adjusted mortality counts in 2020 are generally lower because the German population has been steadily aging in recent years.</p> <h3 id=year_aggregated_mortality ><a href="#year_aggregated_mortality">Year aggregated mortality</a></h3> <p>The total count of deceased persons in the given year is computed by summing monthly mortality results, in total numbers, as well as adjusted by age and gender.</p> <img src="/Sterbestatistik/assets/averageeffects_months/output/adjusted_deaths_years.svg" alt=""> <p>When adjusted for age and gender, the year 2020 has the second lowest mortality &#40;among years 2016 to 2020&#41; in Germany.</p> <p>2020 saw &#40;how could this be computed?&#41; deaths less/more than would have been expected given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020. Only the directly preceding year 2019 had even lower mortality. A fact that is notable because in 2020 no strong catch-up effect can be observed.</p> <p>Yet, comparing these numbers unadjusted &#40;<code>difference</code>&#41; again is not fair, considering the population growth from 2016 to 2020: <code>D_sum_sum</code> is the &quot;data&quot;, <code>Dadj_sum_sum</code> is the &quot;age-gender-adjusted&quot; curve above. <code>D_pop_adj</code> is the mortality adjusted to the assumption that all years had fixed population <span class=katex ><span class=katex-mathml ><math xmlns="http://www.w3.org/1998/Math/MathML"><semantics><mrow><mi>E</mi><mo stretchy=false >(</mo><mi>N</mi><mo stretchy=false >)</mo></mrow><annotation encoding="application/x-tex">E(N)</annotation></semantics></math></span><span class=katex-html  aria-hidden=true ><span class=base ><span class=strut  style="height:1em;vertical-align:-0.25em;"></span><span class="mord mathnormal" style="margin-right:0.05764em;">E</span><span class=mopen >(</span><span class="mord mathnormal" style="margin-right:0.10903em;">N</span><span class=mclose >)</span></span></span></span> used in the adjustment formula.</p> <pre><code class="julia hljs">D_2016_2021_Tage = <span class=hljs-built_in >Dict</span>( j =&gt; d 
+	<span class=hljs-keyword >for</span> (j,d) <span class=hljs-keyword >in</span> zip((<span class=hljs-number >2020</span>,<span class=hljs-number >2019</span>,<span class=hljs-number >2018</span>, <span class=hljs-number >2017</span>, <span class=hljs-number >2016</span>), 
+	                 (<span class=hljs-number >982489</span>,  <span class=hljs-number >939520</span>,  <span class=hljs-number >954874</span>,  <span class=hljs-number >932263</span>,  <span class=hljs-number >910899</span>)))
+expected_deaths[:,:totalxls] = 
+	[ D_2016_2021_Tage[j] <span class=hljs-keyword >for</span> j <span class=hljs-keyword >in</span> expected_deaths.Jahr ]
+expected_deaths[:,:Population] = 
+	[ N_sum[j] <span class=hljs-keyword >for</span> j <span class=hljs-keyword >in</span> expected_deaths.Jahr ]
+expected_deaths[:,:D_pop_adj] = 
+	round.(EN_sum * expected_deaths.D_sum_sum ./ expected_deaths.Population )
+expected_deaths[:,:difference] = 
 	expected_deaths.Dadj_sum_sum .- expected_deaths.D_sum_sum
-expected_deaths&#91;:,:difference_adj&#93; &#61; 
-	round.&#40;expected_deaths.Dadj_sum_sum .- expected_deaths.D_pop_adj&#41;
+expected_deaths[:,:difference_adj] = 
+	round.(expected_deaths.Dadj_sum_sum .- expected_deaths.D_pop_adj)
  
-println&#40;expected_deaths&#41;</code></pre>
-<pre><code class=plaintext >5×9 DataFrame
+println(expected_deaths)</code></pre> <pre><code class="plaintext hljs">5×9 DataFrame
  Row │ Jahr   D_sum_sum  Dadj_sum_sum  D_sum_sum_EN  totalxls  Population  D_pop_adj  difference  difference_adj
      │ Int64  Int64      Float64       Float64       Int64     Int64       Float64    Float64     Float64
 ─────┼───────────────────────────────────────────────────────────────────────────────────────────────────────────
@@ -130,25 +45,20 @@ println&#40;expected_deaths&#41;</code></pre>
    3 │  2018     954874      956343.0      954214.0    954874    82792351   954214.0      1469.0          2129.0
    4 │  2019     939520      927554.0      936305.0    939520    83019213   936305.0    -11966.0         -8751.0
    5 │  2020     982489      944528.0      977390.0    982489    83166711   977390.0    -37961.0        -32862.0
-</code></pre>
-<p>When adjusted for age and gender, the year 2020 has the second lowest mortality &#40;among years 2016 to 2020&#41; in Germany.</p>
-<p>2020 saw &#40;how could this be computed?&#41; deaths less/more than would have been expected given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020. Only the directly preceding year 2019 had even lower mortality. A fact that is notable because in 2020 no strong catch-up effect can be observed.</p>
-<h3 id=sanity_check_deaths_per_year_and_gender ><a href="#sanity_check_deaths_per_year_and_gender">Sanity check: deaths per year and gender</a></h3>
-
-<pre><code class=plaintext >10×2 DataFrame
+</code></pre> <h3 id=sanity_check_deaths_per_year_and_gender ><a href="#sanity_check_deaths_per_year_and_gender">Sanity check: deaths per year and gender</a></h3> <pre><code class="plaintext hljs">10×2 DataFrame
  Row │ jg                  D_sum
      │ Tuple…              Int64
 ─────┼────────────────────────────
-   1 │ (2016, "Männlich")  448304
-   2 │ (2016, "Weiblich")  462595
-   3 │ (2017, "Männlich")  457756
-   4 │ (2017, "Weiblich")  474507
-   5 │ (2018, "Männlich")  470032
-   6 │ (2018, "Weiblich")  484842
-   7 │ (2019, "Männlich")  465885
-   8 │ (2019, "Weiblich")  473635
-   9 │ (2020, "Männlich")  491380
-  10 │ (2020, "Weiblich")  491109
+   1 │ (2016, &quot;Männlich&quot;)  448304
+   2 │ (2016, &quot;Weiblich&quot;)  462595
+   3 │ (2017, &quot;Männlich&quot;)  457756
+   4 │ (2017, &quot;Weiblich&quot;)  474507
+   5 │ (2018, &quot;Männlich&quot;)  470032
+   6 │ (2018, &quot;Weiblich&quot;)  484842
+   7 │ (2019, &quot;Männlich&quot;)  465885
+   8 │ (2019, &quot;Weiblich&quot;)  473635
+   9 │ (2020, &quot;Männlich&quot;)  491380
+  10 │ (2020, &quot;Weiblich&quot;)  491109
 5×2 DataFrame
  Row │ jahr   D_sum
      │ Int64  Int64
@@ -158,21 +68,4 @@ println&#40;expected_deaths&#41;</code></pre>
    3 │  2018  954874
    4 │  2019  939520
    5 │  2020  982489
-</code></pre>
-<div class=page-foot >
-  <div class=copyright >
-    &copy; Dr. Gregor Kappler. Last modified: February 13, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>.
-  </div>
-</div>
-</div>
-        </div> 
-    </div> 
-    
-        <script src="/Sterbestatistik/libs/katex/katex.min.js"></script>
-<script src="/Sterbestatistik/libs/katex/auto-render.min.js"></script>
-<script>renderMathInElement(document.body)</script>
-
-    
-    
-        <script src="/Sterbestatistik/libs/highlight/highlight.pack.js"></script>
-<script>hljs.initHighlightingOnLoad();hljs.configure({tabReplace: '    '});</script>
+</code></pre> <div class=page-foot > <div class=copyright > &copy; Dr. Gregor Kappler. Last modified: February 13, 2021. Website built with <a href="https://github.com/tlienart/Franklin.jl">Franklin.jl</a> and the <a href="https://julialang.org">Julia programming language</a>. </div> </div> </div> </div> </div>
