@@ -1,15 +1,12 @@
 +++
-title = "Adjusted Weekly Mortality"
+title = "Population tables"
 hascode = true
 hasplotly = true
 rss = ""
 +++
 @def tags = ["syntax", "code"]
 
-Adjusting mortalities for age and gender 
-for an unbiased comparisons in an aging society.
-# German Excess Death 2020? 
-
+# Population in Germany 2016-2020
 
 ## Collecting values in a table
 The lookup functions `population` are used in 

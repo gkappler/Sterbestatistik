@@ -10,82 +10,21 @@ Adjusting mortalities for age and gender
 for an unbiased comparisons in an aging society.
 # German Excess Death 2020? 
 
-## Collecting values in a table
-The lookup functions `population` are used in 
-a multi-dimensional julia comprehension `[f(...) for ...]` and 
-converted to a `DataFrame` `poda` (abbrev. population data).
-
 
 ```julia:./deathdf
+# hideall
 # Julia sets of values in the condition variables:  # hide
 include("./_assets/scripts/groups.jl") # hide
 # load functions:  # hide
 altersgruppen = altersgruppen_months
 include("./_assets/scripts/population.jl") # hide
 include("./_assets/scripts/deaths.jl") # hide
-
-poda[1:10,:] |> println # hide
 ```
-
-The data is comprised of rows like for the `0:30` age group:
-\show{./deathdf}
 
 ```julia:./agegroups
 # hideall
 println(join([ "[$(x.start),$(x.stop)[" for x in  altersgruppen ], ", "))
 ```
-
-
-## Random Variables
-are the strict formulations in probability theory, for scientific notation.
-### Conditioning Variables:
-- Jahre/years $J: \Omega \rightarrow \{2016,\ldots,2020\}$
-- Months: $M: \Omega \rightarrow \{1, \ldots, 12\}$
-
-- Geschlechter/Gender $G: \Omega \rightarrow \{Männlich, Weiblich\}$
-- altersgruppen, age: $A: \Omega \rightarrow \{\textoutput{./agegroups}\}$
-
-
-### Observables:
-- Deaths are observed $D | J,M,G,A: \Omega \rightarrow \mathbb{N}$
-- Population $N |J,G,A: \Omega \rightarrow \mathbb{N}$
-
-Note: death statistics are observed for each month (as well as year, gender, age), 
-but population statistics are observed only for combinations of year, gender, and age.
-
-## Probabilities and adjusted Expectations
-Death counts at month $J=j, M=m$ can be adjusted for
-- $P(A=a, G=g)$: average joint distribution of age and gender, 
-- $E(N)$: average population count,
-both averaged accross all observed years.
-
-$E^{adj}(D | J=j, M=m) =$
-$$
-\sum_{a,g \in A, G} \left[ 
-	\underbrace{E\left( \frac{D}{N} | A=a, G=g, J=j, M=m \right)}_{A \times G\text{ mortality rates}}
-	\underbrace{P(A=a, G=g)}_{\text{average} A \times G\text{ distribution}} 
-  \right]
-  	\underbrace{E(N)}_{\text{average population count}},
-$$
-$\forall j \in \{2016,\ldots,2020\}, w \in \{1,\ldots,12\}$
-
-### Notes regarding Notation (Photo Rolf)
-were expanded with $M$ for month number.
-#### Formel (1)
-$$
-P^{2016}( I_+=1 | G=g, A=a) = E\left[\frac{D}{N} | A=a, G=g, J=2016, M=m \right]
-$$
-
-#### Formel (2)
-$$
-P^{2020}_{adj}( + ) = E^{adj}(D | J, M) / E(N)
-$$
-
-#### Formel (3)
-$$
-P(A=a, G=g)
-$$
-
 
 ### Adjusted data
 For adjustment, age and gender specific mortality is estimated for each calendar week, 
@@ -179,24 +118,31 @@ savefig(joinpath(@OUTPUT, "adjusted_deaths_years.svg")) # hide
 
 
 ## Reproduction of Data-Visualisation of the *Statistisches Bundesamt*
-[Official mortality analysis](https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Sterbefaelle-Lebenserwartung/sterbefallzahlen.html) shows a graph of weekly mortalityfrom 2016-2020.
+See also the weekly mortality from 2016-2020 [comparison with official plotting](/averageeffects/#reproduction_of_data-visualisation_of_the_statistisches_bundesamt).
 
-Our reproduction seems identical:
 \fig{./deaths}
 
-The age- and gender-adjusted mortality counts in 2020 are low until autumn.
-The mortality increase in Winter 2020 is less pronounced than when looking at values 
-biased by the confounders from an aging society.
+In an aging society the actual mortality counts are biased.
 
 \fig{./adjusted_deaths}
 
+The age- and gender-adjusted mortality counts in 2020 are generally lower
+because the German population has been steadily aging in recent years.
 
 ### Year aggregated mortality
-Summing weekly mortality results in the total count of deceased persons in the given year,
+The total count of deceased persons in the given year is computed by summing monthly mortality results,
 in total numbers, as well as adjusted by age and gender.
 
-
 \fig{./adjusted_deaths_years}
+
+
+When adjusted for age and gender, the year 2020 has the second lowest mortality (among years 2016 to 2020) in Germany.
+
+
+2020 saw (how could this be computed?) deaths less/more than would have been expected
+given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020.
+Only the directly preceding year 2019 had even lower mortality.
+A fact that is notable because in 2020 no strong catch-up effect can be observed.
 
 Yet, comparing these numbers unadjusted (`difference`) again is not fair, considering the population growth from 2016 to 2020:
 `D_sum_sum` is the "data", `Dadj_sum_sum` is the "age-gender-adjusted" curve above.
@@ -221,14 +167,6 @@ println(expected_deaths)
 ```
 \output{./total_deaths}
 
-
-When adjusted for age and gender, the year 2020 has the second lowest mortality (among years 2016 to 2020) in Germany.
-
-
-2020 saw (how could this be computed?) deaths less/more than would have been expected
-given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020.
-Only the directly preceding year 2019 had even lower mortality.
-A fact that is notable because in 2020 no strong catch-up effect can be observed.
 
 
 

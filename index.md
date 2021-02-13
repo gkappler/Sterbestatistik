@@ -1,63 +1,83 @@
 @def title = "German Excess Death 2020?"
 @def tags = ["syntax", "code"]
 
-# German Excess Death 2020?
-This repository contains 
-### Data
-the official *data* from the "Statistisches Bundesamt" (in German),
-  - Population :: by year, gender, and age (the data shown in population pyramids)
-  - Death counts :: by week and year, also per gender and age.
-
-### Analysis
-The *analysis* aims at 
-adjusting deaths statistics for 
-bias effects in an aging population. 
-Technically "average causal effects of year on mortalities", 
-correct for age and gender.
-Weekly adjusted death counts can be compared accross years 
-without bias from the overall aging that occured from 2016 to 2020.
-
 ### Tutorial
 This *tutorial* shows 
-- how to prepare datasets in julia keyword functions
-- Estimating average causal year-effects, corrected for age and gender.
-- can such data prep code be shared efficiently with the community of information researchers.
-
-On this data prep example I express data lookup as julia keyword functions 
-(for providing value-conditions).
-Calling a function is convenient.
-Looking up values in tables is more tedious:
+- how to [prepare](/dataprep/) datasets in julia keyword functions
+- reproduce [weekly mortality graph](/averageeffects/#reproduction_of_data-visualisation_of_the_statistisches_bundesamt)
+- Estimating [average causal year-effects](/averageeffects_months/#year_aggregated_mortality), corrected for age and gender.
+and discusses some ideas how data prep code can be shared efficiently 
+with the community of information researchers.
 
 
+# German Excess Death 2020?
+This repository uses
 ## Data
-### **Data**: "Sterbefaelle-Lebenserwartung"
-goal: julia function to look up information in official data tables.
-```julia
-deaths(year=2020, cw=1,
-       geschlecht="Männlich",
-       alter=50:60)
-```
+from the official data from the German "Statistisches Bundesamt",
+  - [Population](/dataprep#data_mortality_statistics): by year, gender, and age (the data shown in population pyramids)
+  - [Death counts](/dataprep/#data_population_statistics_pyramid): by week and year, also per gender and age.
 
-Source: [statistisches Bundesamt](https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Sterbefaelle-Lebenserwartung/Tabellen/sonderauswertung-sterbefaelle.html) (Download [xlsx](https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Sterbefaelle-Lebenserwartung/Tabellen/sonderauswertung-sterbefaelle.xlsx?__blob=publicationFile)),
 
-The death count data is an **excel** file
-with many tabs,
-the gender needs to be looked up by tab
-in the right one with data by calendar week.
-The age groups are 0-30, then in 5-year groups, then more than 95.
+## Analysis
+adjusts deaths statistics for bias effects in an aging population
+(i.e. average causal effects of year on mortality, correct for age and gender).
+Weekly and monthly adjusted death counts can be compared accross years 
+without bias from the overall aging that occured from 2016 to 2020.
 
-### **Data**: Population statistics (pyramid)
-goal: julia function to look up information in official data tables.
-```julia
-population(year=2020,
-           geschlecht="Männlich",
-           alter=50:60)
-```
 
-Source: [Statistisches Bundesamt, Tabelle 12411-0006](https://www-genesis.destatis.de/genesis//online?operation=table&code=12411-0006&bypass=true&levelindex=0&levelid=1612115589154#abreadcrumb)
 
-The population statistics is a single
-comma separated values file,
-not simple, with some header information, and footer.
-The age groups here are by year, with aggregation above 85.
+
+### Random Variables
+Are the strict formulations in probability theory, for scientific notation.
+#### Conditioning Variables:
+- Jahre/years $J: \Omega \rightarrow \{2016,\ldots,2020\}$
+- Week: $W: \Omega \rightarrow \{1, \ldots, 53\}$
+
+- Geschlechter/Gender $G: \Omega \rightarrow \{Männlich, Weiblich\}$
+- altersgruppen, age: $A: \Omega \rightarrow \{a_1, \ldots, a_k\}$
+  
+
+#### Observables:
+- Deaths are observed $D | J,W,G,A: \Omega \rightarrow \mathbb{N}$
+- Population $N |J,G,A: \Omega \rightarrow \mathbb{N}$
+
+Note: death statistics are observed for each week (as well as year, gender, age), 
+but population statistics are observed only for combinations of year, gender, and age.
+
+## Probabilities and adjusted Expectations
+Death counts at week $J=j, W=w$ can be adjusted for
+- $P(A=a, G=g)$: average joint distribution of age and gender, 
+- $E(N)$: average population count,
+both averaged accross all observed years.
+
+$E^{adj}(D | J=j, W=w) =$
+$$
+\sum_{a,g \in A, G} \left[ 
+	\underbrace{E\left( \frac{D}{N} | A=a, G=g, J=j, W=w \right)}_{A \times G\text{ mortality rates}}
+	\underbrace{P(A=a, G=g)}_{\text{average} A \times G\text{ distribution}} 
+  \right]
+  	\underbrace{E(N)}_{\text{average population count}},
+$$
+$\forall j \in \{2016,\ldots,2020\}, w \in \{1,\ldots,53\}$
+
+### Notes regarding Notation (Photo Rolf)
+were expanded with $W$ for week number.
+
+Formel (1)
+$$
+P^{2016}( I_+=1 | G=g, A=a) = E\left[\frac{D}{N} | A=a, G=g, J=2016, W=w \right]
+$$
+
+Formel (2)
+$$
+P^{2020}_{adj}( + ) = E^{adj}(D | J, W) / E(N)
+$$
+
+Formel (3)
+$$
+P(A=a, G=g)
+$$
+
+
+
 
