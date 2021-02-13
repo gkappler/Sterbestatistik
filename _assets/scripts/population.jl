@@ -31,3 +31,39 @@ function population(; jahr, geschlecht="Insgesamt", alter)
         iseq(p[:,2], alter)
     sum(p[rows, geschlecht])
 end
+
+
+
+poda = [ 
+  ( alter = a,
+    geschlecht=g, 
+    jahr=j,
+    N=population(alter=a, geschlecht=g, jahr=j)
+#    D=deaths(alter=a, geschlecht=g, jahr=j)
+  )
+  for a in altersgruppen
+  for g in geschlechter
+  for j in jahre 
+  ] |> DataFrame;
+
+
+
+N_sum = Dict(
+   r[1] => r[2] 
+   for r in eachrow(
+              combine(groupby(poda, :jahr), 
+                      :N=>sum)))
+
+
+using Statistics
+using StatsPlots
+using StatsPlots.PlotMeasures
+poda[:,:P] = poda.N ./ [ N_sum[j] for j in poda.jahr ]
+poda[:,:cell] = collect(zip(poda.alter,poda.geschlecht))
+
+PAG_mean = let tmp = combine(groupby(poda, :cell), 
+                  :P=>mean)
+    Dict([ r[1] => r[2] 
+           for r in eachrow(tmp)
+	   ])
+end

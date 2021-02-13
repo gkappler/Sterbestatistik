@@ -10,7 +10,6 @@ Adjusting mortalities for age and gender
 for an unbiased comparisons in an aging society.
 # German Excess Death 2020? 
 
-
 ## Collecting values in a table
 The lookup functions `population` are used in 
 a multi-dimensional julia comprehension `[f(...) for ...]` and 
@@ -21,7 +20,7 @@ converted to a `DataFrame` `poda` (abbrev. population data).
 # Julia sets of values in the condition variables:  # hide
 include("./_assets/scripts/groups.jl") # hide
 # load functions:  # hide
-altersgruppen = altersgruppen_kw
+altersgruppen = altersgruppen_months
 include("./_assets/scripts/population.jl") # hide
 include("./_assets/scripts/deaths.jl") # hide
 
@@ -38,48 +37,48 @@ println(join([ "[$(x.start),$(x.stop)[" for x in  altersgruppen ], ", "))
 
 
 ## Random Variables
-Are the strict formulations in probability theory, for scientific notation.
+are the strict formulations in probability theory, for scientific notation.
 ### Conditioning Variables:
 - Jahre/years $J: \Omega \rightarrow \{2016,\ldots,2020\}$
-- Week: $W: \Omega \rightarrow \{1, \ldots, 53\}$
+- Months: $M: \Omega \rightarrow \{1, \ldots, 12\}$
 
 - Geschlechter/Gender $G: \Omega \rightarrow \{Männlich, Weiblich\}$
 - altersgruppen, age: $A: \Omega \rightarrow \{\textoutput{./agegroups}\}$
 
 
 ### Observables:
-- Deaths are observed $D | J,W,G,A: \Omega \rightarrow \mathbb{N}$
+- Deaths are observed $D | J,M,G,A: \Omega \rightarrow \mathbb{N}$
 - Population $N |J,G,A: \Omega \rightarrow \mathbb{N}$
 
-Note: death statistics are observed for each week (as well as year, gender, age), 
+Note: death statistics are observed for each month (as well as year, gender, age), 
 but population statistics are observed only for combinations of year, gender, and age.
 
 ## Probabilities and adjusted Expectations
-Death counts at week $J=j, W=w$ can be adjusted for
+Death counts at month $J=j, M=m$ can be adjusted for
 - $P(A=a, G=g)$: average joint distribution of age and gender, 
 - $E(N)$: average population count,
 both averaged accross all observed years.
 
-$E^{adj}(D | J=j, W=w) =$
+$E^{adj}(D | J=j, M=m) =$
 $$
 \sum_{a,g \in A, G} \left[ 
-	\underbrace{E\left( \frac{D}{N} | A=a, G=g, J=j, W=w \right)}_{A \times G\text{ mortality rates}}
+	\underbrace{E\left( \frac{D}{N} | A=a, G=g, J=j, M=m \right)}_{A \times G\text{ mortality rates}}
 	\underbrace{P(A=a, G=g)}_{\text{average} A \times G\text{ distribution}} 
   \right]
   	\underbrace{E(N)}_{\text{average population count}},
 $$
-$\forall j \in \{2016,\ldots,2020\}, w \in \{1,\ldots,53\}$
+$\forall j \in \{2016,\ldots,2020\}, w \in \{1,\ldots,12\}$
 
 ### Notes regarding Notation (Photo Rolf)
-were expanded with $W$ for week number.
+were expanded with $M$ for month number.
 #### Formel (1)
 $$
-P^{2016}( I_+=1 | G=g, A=a) = E\left[\frac{D}{N} | A=a, G=g, J=2016, W=w \right]
+P^{2016}( I_+=1 | G=g, A=a) = E\left[\frac{D}{N} | A=a, G=g, J=2016, M=m \right]
 $$
 
 #### Formel (2)
 $$
-P^{2020}_{adj}( + ) = E^{adj}(D | J, W) / E(N)
+P^{2020}_{adj}( + ) = E^{adj}(D | J, M) / E(N)
 $$
 
 #### Formel (3)
@@ -88,58 +87,25 @@ P(A=a, G=g)
 $$
 
 
-### Average joint age, gender distribution `PAG_mean=` $P(A, G)$
-```julia:./populationcellprob
-using Statistics
-using StatsPlots
-using StatsPlots.PlotMeasures
-poda[:,:P] = poda.N ./ [ N_sum[j] for j in poda.jahr ]
-poda[:,:cell] = collect(zip(poda.alter,poda.geschlecht))
-tmp = combine(groupby(poda, :cell), 
-              :P=>mean)
-PAG_mean = Dict([ r[1] => r[2] 
-                for r in eachrow(tmp)
-			  ])
-		
-```
-
-This plot is only for checking errors:
-```julia:./populationcellprob2
-# hideall
-tmp = [ ( A=k[1].start, G=k[2], p = 100*v/(k[1].stop-k[1].start)) 
-	    for (k,v) in PAG_mean ] |> DataFrame
-
-
-@df tmp[sortperm(tmp.A),:] plot(:A,:p, group=:G, lw=3, legend=:bottomright,
-    xlabel="Alter",
-    ylabel="% Bevölkerung",
-    title="Bevölkerungsanteil (mittel 2016-2020) in Deutschland",
-)
-
-savefig(joinpath(@OUTPUT, "Pmean.svg")) # hide
-```
-
-\fig{./Pmean}
-
-
 ### Adjusted data
 For adjustment, age and gender specific mortality is estimated for each calendar week, 
 from  `population` as well as `deaths` data,
 and adjusted according to the formula above,
 converted to a `DataFrame` `moda` (abbrev. mortality data).
 ```julia:./adjusted
+
 moda = [
     ( jahr=j, alter=a, geschlecht=g,
-      kw=kw,
+      month=m,
       N = population(jahr=j,alter=a,geschlecht=g),
-      D = deaths(jahr=j, alter=a, geschlecht=g, kw=kw),
+      D = deaths(jahr=j, alter=a, geschlecht=g, month=m),
       marginalP = PAG_mean[ (a,g) ]
-	)
-    for a in altersgruppen, 
-        kw in 1:53, 
+    )
+    for a in altersgruppen_months, 
+        m in 1:12, 
         g in geschlechter,
         j in jahre
-    if deaths(jahr=j,alter=a,geschlecht=g,kw=kw) isa Int
+    if deaths(jahr=j,alter=a,geschlecht=g,month=m) isa Int
 	] |> DataFrame
 
 # Formel 3
@@ -155,42 +121,46 @@ moda[1:2,:] |> println
 
 ```julia:./plotdata
 # hideall
-moda[:,:cell] = collect(zip(moda.jahr, moda.kw))
+moda[:,:cell] = collect(zip(moda.jahr, moda.month))
 plot_data = combine(groupby(moda,:cell),
     :D => sum,
     :Dadj => sum)
 plot_data[:,:Jahr] = [ x[1] for x in plot_data[:,1] ]
-plot_data[:,:kw] = [ x[2] for x in plot_data[:,1] ];
-plot_data = plot_data[(plot_data.D_sum .> 0) .| (plot_data.kw .<= 52),:]
+plot_data[:,:month] = [ x[2] for x in plot_data[:,1] ];
+# plot_data = plot_data[(plot_data.D_sum .> 0) .| (plot_data.month .<= 52),:]
 
 #using PlotlyJS
 #plotly()
 # Farben Bundesamt
 lcolors = [ "#006298", "#A02438", "#449ADC", "#002B52", "#EC4A60" ]
-yticks = 0:5000:30000
-@df plot_data plot(:kw, :D_sum, group=:Jahr; lw=3, 
+yticks = 0:10000:110000
+xticks = 1:12
+@df plot_data plot(:month, :D_sum, group=:Jahr; lw=3, 
     palette=lcolors, 
-    xlabel="Kalenderwoche",
-    title="Wöchentliche Sterbefallzahlen in Deutschland",
+    xlabel="Monat",
+    title="Monatliche Sterbefallzahlen in Deutschland",
 	left_margin=50px,
-    ylims=(0,32000), yticks=yticks, yformatter=:plain,
+	xticks=xticks, 
+	ylims=(0,110000), yticks=yticks, 
+	yformatter=:plain,
     legend=:bottomright
 )
 savefig(joinpath(@OUTPUT, "deaths.svg")) # hide
 
 
-@df plot_data plot(:kw, :Dadj_sum, group=:Jahr;lw=3,
+@df plot_data plot(:month, :Dadj_sum, group=:Jahr;lw=3,
     palette=lcolors, 
-    xlabel="Kalenderwoche",
+    xlabel="Monat",
     title="Adjustierte (2020) Sterbefallzahlen in Deutschland",
 	left_margin=50px,
-    ylims=(0,32000), yticks=yticks, yformatter=:plain,
+	xticks=xticks, 
+    ylims=(0,110000), yticks=yticks, 
+	yformatter=:plain,
     legend=:bottomright
 )
 savefig(joinpath(@OUTPUT, "adjusted_deaths.svg")) # hide
 
 
-# select(poda,tuple(:D, :expected))
 expected_deaths = combine(groupby(plot_data,:Jahr), 
     :D_sum => sum, 
     :Dadj_sum => sum)
@@ -251,17 +221,14 @@ println(expected_deaths)
 ```
 \output{./total_deaths}
 
-When adjusted for age and gender, the year 2020 has highest mortality (among years 2016 to 2020) in Germany,
-but does not exceed those years too much.
 
-We need to check:
-- what about week 53?
-  When removing that week, the results change drastically:
-  Only the directly preceding year 2019 had even lower mortality
-  (a fact that is notable because no catch-up effect can be observed).
+When adjusted for age and gender, the year 2020 has the second lowest mortality (among years 2016 to 2020) in Germany.
 
 
- 
+2020 saw (how could this be computed?) deaths less/more than would have been expected
+given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020.
+Only the directly preceding year 2019 had even lower mortality.
+A fact that is notable because in 2020 no strong catch-up effect can be observed.
 
 
 
@@ -282,6 +249,4 @@ CSV.write("_assets/data.csv", moda)
 
 
 \output{./deathtable}
-
-
 
