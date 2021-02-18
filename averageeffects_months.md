@@ -7,8 +7,13 @@ rss = ""
 @def tags = ["syntax", "code"]
 
 Adjusting mortalities for age and gender 
-for an unbiased comparisons in an aging society.
-# German Excess Death 2020? 
+for an unbiased comparisons in an aging society, has there been
+# German Excess Mortality in 2020? 
+Before reading this document, please consider betting your expectation in our questionaire for a publication with 
+[Prof. Rolf Steyer](https://www.metheval.uni-jena.de/team_mitarbeiter.php?select=1):
+
+
+[Yes, take me to the questionaire!](https://docs.google.com/forms/d/e/1FAIpQLScXsUuYoDmr5vBBh2cvXrwy1q3gs_JW99k4g6etx_uZ5-8oeQ/viewform?usp=sf_link)
 
 
 ```julia:./deathdf
@@ -117,7 +122,7 @@ savefig(joinpath(@OUTPUT, "adjusted_deaths_years.svg")) # hide
 ```
 
 
-## Reproduction of Data-Visualisation of the *Statistisches Bundesamt*
+## Data-Visualisation in style of *Statistisches Bundesamt*
 See also the weekly mortality from 2016-2020 [comparison with official plotting](/averageeffects/#reproduction_of_data-visualisation_of_the_statistisches_bundesamt).
 
 \fig{./deaths}
@@ -140,7 +145,7 @@ When adjusted for age and gender, the year 2020 has the second lowest mortality 
 
 
 2020 saw (how could this be computed?) deaths less/more than would have been expected
-given average mortality rates from 2016-2020 and the joint age-gender distribution in 2020.
+given age-gender-conditional mortality rates from 2016-2019 and the joint age-gender distribution in 2020.
 Only the directly preceding year 2019 had even lower mortality.
 A fact that is notable because in 2020 no strong catch-up effect can be observed.
 
@@ -188,3 +193,5 @@ CSV.write("_assets/data.csv", moda)
 
 \output{./deathtable}
 
+## Print & Media references:
+- https://www.br.de/nachrichten/wissen/sind-2020-weniger-menschen-gestorben-als-in-den-jahren-davor

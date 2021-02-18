@@ -6,13 +6,13 @@ hascode = true
 
 \toc
 
-## Overview
+## Sources
 On this data prep example I express data lookup as julia keyword functions 
 (for providing value-conditions).
 Calling a function is convenient.
 Looking up values in tables is more tedious:
 
-### **Data**: Mortality statistics
+### Mortality statistics
 **Goal**: julia function to look up information in official data tables.
 ```julia
 deaths(year=2020, cw=1,
@@ -28,7 +28,7 @@ the gender needs to be looked up by tab
 in the right one with data by calendar week.
 The age groups are 0-30, then in 5-year groups, then more than 95.
 
-### **Data**: Population statistics (pyramid)
+### Population statistics (pyramid)
 **Goal**: julia function to look up information in official data tables.
 ```julia
 population(year=2020,
@@ -43,8 +43,14 @@ comma separated values file,
 not simple, with some header information, and footer.
 The age groups here are by year, with aggregation above 85.
 
+CAVEAT:
+- Alternative Data (not used): [Pyramid](https://service.destatis.de/bevoelkerungspyramide/index.html#!y=2018&v=2)
+- [Podcast](https://www.destatis.de/DE/Themen/Gesellschaft-Umwelt/Bevoelkerung/Sterbefaelle-Lebenserwartung/Podcast/podcast-sterbefaelle.html)
 
-# A tutorial for *Scientific Data Preparation* with julia.
+
+[Read the results, or continue reading the details of data preparation:](/averageeffects_months/)
+
+## A tutorial for *Scientific Data Preparation* with julia.
 
 Values need to be looked up 
 for combinations of the following variables (and calendar week):
@@ -57,7 +63,8 @@ The process of looking up data values needs to be formalized.
 Lookup needs to be expressed in terms of a programming language, here julia function calls.
 What julia function will be more simple?
 
-## Population
+
+### Population
 The comma separated values (CSV) file would e.g. be loaded, trimmed and parsed 
 \input{julia}{/_assets/scripts/population.jl}
 
@@ -66,7 +73,7 @@ The aggregation with `UnitRange` is convenient
 but can be further improved.
 
 
-## Deaths statistics (XLSX)
+### Deaths statistics (XLSX)
 But now with the excel it is funny.
 \input{julia}{/_assets/scripts/deaths.jl}
 
@@ -84,14 +91,3 @@ f(;kw=missing, args...) = (N=population(; args...), D=deaths(; kw=kw,args...))
 @show f(alter=30:35, geschlecht="Männlich", jahr=2020)
 ```
 \output{./deaths_example.jl}
-
-## Next steps
-Data preparation never feels perfect.
-Always keeps hurting a bit.
-A next steps list helps
-(to avoid the addiction of perfect):
-- assert correct conditioning value
-- `geschlecht`: internationalize, Symbol?
-- all variables english?
-
-Let me know what you find most important, please.

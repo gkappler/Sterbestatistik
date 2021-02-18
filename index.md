@@ -1,24 +1,25 @@
-@def title = "German Excess Death 2020?"
+@def title = "German Excess Mortality 2020?"
 @def tags = ["syntax", "code"]
 
-### Tutorial
-This *tutorial* shows 
-- how to [prepare](/dataprep/) datasets in julia keyword functions
-- reproduce [weekly mortality graph](/averageeffects/#reproduction_of_data-visualisation_of_the_statistisches_bundesamt)
-- Estimating [average causal year-effects](/averageeffects_months/#year_aggregated_mortality), corrected for age and gender.
-and discusses some ideas how data prep code can be shared efficiently 
-with the community of information researchers.
+This *tutorial* shows how to
+- [prepare](/dataprep/) datasets in julia keyword functions
+- plot [weekly](/averageeffects/#reproduction_of_data-visualisation_of_the_statistisches_bundesamt) and
+  [monthly](http://localhost:8000/averageeffects_months/#data-visualisation_in_style_of_statistisches_bundesamt) mortality 
+  in the style of Statistisches Bundesamt, with raw data and estimates adjusted for change in age and gender distribution across years,
+- estimate [average causal year-effects](/averageeffects_months/#year_aggregated_mortality), corrected for age and gender,
+and [reflects how tools used for this site can share data and code](/reflection/) 
+efficiently with the community of information researchers.
 
 
-# German Excess Death 2020?
-This repository uses
-## Data
+# German Excess Mortality 2020?
+This repository uses 
+Data
 from the official data from the German "Statistisches Bundesamt",
   - [Population](/dataprep#data_mortality_statistics): by year, gender, and age (the data shown in population pyramids)
   - [Death counts](/dataprep/#data_population_statistics_pyramid): by week and year, also per gender and age.
 
 
-## Analysis
+The Analysis
 adjusts deaths statistics for bias effects in an aging population
 (i.e. average causal effects of year on mortality, correct for age and gender).
 Weekly and monthly adjusted death counts can be compared accross years 
