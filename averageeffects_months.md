@@ -34,7 +34,7 @@ println(join([ "[$(x.start),$(x.stop)[" for x in  altersgruppen ], ", "))
 ### Adjusted data
 For adjustment, age and gender specific mortality is estimated for each calendar week, 
 from  `population` as well as `deaths` data,
-and adjusted according to the formula above,
+and adjusted according to the [formula](/#probabilities_and_adjusted_expectations),
 converted to a `DataFrame` `moda` (abbrev. mortality data).
 ```julia:./adjusted
 
