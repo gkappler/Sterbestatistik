@@ -67,10 +67,6 @@ For two specific dataset it was more effective to
 3. wire the lookup in functions.
 It would be a nice grant project to write a julia package to make the remote data available by julia function calls like in [InformationMycelium.jl](/reflection/#information_mycelium).
 
-Die Daten des statistischen Bundesamtes sind Daten verfügbar nach Auswahl von Spalten.
-Es existiert auch ein API zur Abfrage der Daten des statistischen Bundesamtes.
-Dieses wurde hier nicht verwendet, da die Definition der Schnittstelle sehr umfangreich ist.
-Für spezifische Daten wie hier ist das manuelle Herunterladen und Auslesen mit Hilfsfunktionen schneller umzusetzen.
 
 
 ### google forms
