@@ -11,7 +11,6 @@ plot_data[:,:month] = [ x[2] for x in plot_data[:,1] ];
 #using PlotlyJS
 #plotly()
 # Farben Bundesamt
-lcolors = [ "#006298", "#A02438", "#449ADC", "#002B52", "#EC4A60" ]
 yticks = 0:10000:110000
 xticks = 1:12
 @df plot_data plot(:month, :D_sum, group=:Jahr; lw=3, 

@@ -26,6 +26,7 @@ mn = [ 100*population(jahr=j, alter=a, geschlecht=geschlecht)/N_sum[j]
 sx = repeat(jahre, inner = length(altersgruppen))
 
 groupedbar(string.(nam), mn, group = sx, ylabel = "% der Bevölkerung", 
+           left_margin=50px,
            palette=lcolors, 
            title = "Veränderung der Altersgruppen-Verteilung $geschlecht")
 end
@@ -45,6 +46,7 @@ mn = [ 100*PAG_mean[(a, g)]
 sx = repeat(geschlechter, inner = length(altersgruppen))
 
 groupedbar(string.(nam), mn, group = sx, ylabel = "% der Bevölkerung", 
+           left_margin=50px,
            palette=lcolors, 
            title = "Durchschnittliche der Altersgruppen-Geschlechts-Verteilung")
 savefig(joinpath(@OUTPUT, "PAG_mean.svg")) 
