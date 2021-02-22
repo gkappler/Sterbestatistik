@@ -25,7 +25,7 @@ using Dates
 iseq(x,y) = [ e.start >= y.start && e.stop < y.stop
               for e in x ]
 function population(; jahr, geschlecht="Insgesamt", alter)
-    @assert geschlecht in geschlechter
+    # @assert geschlecht in geschlechter
     ## todo: boundary checks!
     rows = (p[:,1] .== Date(jahr-1,12,31)) .&
         iseq(p[:,2], alter)
