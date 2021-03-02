@@ -63,6 +63,7 @@ moda[1:2,:] |> println
 \output{./adjusted}
 
 
+ 
 ```julia:./plotdata
 # hideall
 moda[:,:cell] = collect(zip(moda.jahr, moda.month))
@@ -117,6 +118,7 @@ expected_deaths[:,:D_sum_sum_EN] = round.(expected_deaths.D_sum_sum ./ [ N_sum[y
 @df expected_deaths plot!(:Jahr,:Dadj_sum_sum; label="age-gender adjusted", lw=3)
 
 savefig(joinpath(@OUTPUT, "adjusted_deaths_years.svg")) # hide
+
 #fdplotly(json(plt)) # hide
 ```
 
@@ -141,41 +143,26 @@ in total numbers, as well as adjusted by age and gender.
 
 
 When adjusted for age and gender, the year 2020 has the second lowest mortality (among years 2016 to 2020) in Germany.
-
-
-2020 saw (how could this be computed?) deaths less/more than would have been expected
-given age-gender-conditional mortality rates from 2016-2019 and the joint age-gender distribution in 2020.
 Only the directly preceding year 2019 had even lower mortality.
 A fact that is notable because in 2020 no strong catch-up effect can be observed.
 
-Yet, comparing these numbers unadjusted (`difference`) again is not fair, considering the population growth from 2016 to 2020:
-`D_sum_sum` is the "data", `Dadj_sum_sum` is the "age-gender-adjusted" curve above.
-`D_pop_adj` is the mortality adjusted to the assumption that all years had fixed population $E(N)$ used in the adjustment formula.
-
 ```julia:./total_deaths
+# hideall
 D_2016_2021_Tage = Dict( j => d 
 	for (j,d) in zip((2020,2019,2018, 2017, 2016), 
 	                 (982489,  939520,  954874,  932263,  910899)))
 expected_deaths[:,:totalxls] = 
 	[ D_2016_2021_Tage[j] for j in expected_deaths.Jahr ]
-expected_deaths[:,:Population] = 
-	[ N_sum[j] for j in expected_deaths.Jahr ]
-expected_deaths[:,:D_pop_adj] = 
-	round.(EN_sum * expected_deaths.D_sum_sum ./ expected_deaths.Population )
-expected_deaths[:,:difference] = 
-	expected_deaths.Dadj_sum_sum .- expected_deaths.D_sum_sum
-expected_deaths[:,:difference_adj] = 
-	round.(expected_deaths.Dadj_sum_sum .- expected_deaths.D_pop_adj)
- 
-println(expected_deaths)
+println(select(expected_deaths, "totalxls"=>"Total", "D_sum_sum"=>"Total sum", "D_sum_sum_EN" => "N adjusted", "Dadj_sum_sum" => "age-gender adjusted"))
 ```
 \output{./total_deaths}
 
+`Total` is the crude counts (`Total sum` is for sanity check), `age-gender adjusted` is the mortalities adjusted to average distribution of age and gender accross 2016:2020.
+`N adjusted` is the mortality adjusted to the assumption that all years had fixed population $E(N)$ used in the adjustment formula.
 
-
+<!-- Yet, comparing these numbers unadjusted (`difference`) again is not fair, considering the population growth from 2016 to 2020: -->
 
 ### Sanity check: deaths per year and gender
-
 ```julia:./deathtable
 # hideall
 moda[:,:jg] = collect(zip(moda.jahr, moda.geschlecht))
