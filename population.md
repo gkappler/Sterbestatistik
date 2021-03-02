@@ -1,5 +1,5 @@
 +++
-title = "Population tables"
+title = "Population"
 hascode = true
 hasplotly = true
 rss = ""
@@ -75,7 +75,7 @@ sx = repeat(geschlechter, inner = length(altersgruppen))
 groupedbar(string.(nam), mn, group = sx, ylabel = "% der Bevölkerung", 
            left_margin=50px,
            palette=lcolors, 
-           title = "Durchschnittliche der Altersgruppen-Geschlechts-Verteilung")
+           title = "Durchschnitt Altersgruppen-Geschlechts-Verteilung")
 savefig(joinpath(@OUTPUT, "PAG_mean.svg")) 
 
 
@@ -96,6 +96,7 @@ tmp |> println
 
 ### Gender-specific age distributions by year
 Plotting genders separately reveals the same year-patterns in the age groups for females as well as for males, but at gender related longevity patterns (males die earlier).
+
 \fig{./population-ages-Weiblich}
 
 \fig{./population-ages-Männlich}

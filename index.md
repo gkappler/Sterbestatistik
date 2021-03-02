@@ -2,7 +2,7 @@
 @def tags = ["syntax", "code"]
 
 This *tutorial* shows how to
-- [prepare](/dataprep/) datasets in julia keyword functions
+- [prepare](/dataprep/) datasets and make data available as julia keyword functions
 - plot [weekly](/averageeffects/#reproduction_of_data-visualisation_of_the_statistisches_bundesamt) and
   [monthly](http://localhost:8000/averageeffects_months/#data-visualisation_in_style_of_statistisches_bundesamt) mortality 
   in the style of Statistisches Bundesamt, with raw data and estimates adjusted for change in age and gender distribution across years,
@@ -19,14 +19,15 @@ from the official data from the German "Statistisches Bundesamt",
   - [Death counts](/dataprep/#data_population_statistics_pyramid): by week and year, also per gender and age.
 
 
-The Analysis
+## The Analysis
 adjusts deaths statistics for bias effects in an aging population
 (i.e. average causal effects of year on mortality, correct for age and gender).
 Weekly and monthly adjusted death counts can be compared accross years 
 without bias from the overall aging that occured from 2016 to 2020.
 
-
-
+The adjustment method used is the theory of conditional and average causal effects of Rolf Steyer.
+The method has also been suggested to analyse data of [COVID-19 illness](https://gkappler.github.io/CausalCovid-19/) 
+to estimate mortality specifically for covariates.
 
 ### Random Variables
 Are the strict formulations in probability theory, for scientific notation.
@@ -45,7 +46,7 @@ Are the strict formulations in probability theory, for scientific notation.
 Note: death statistics are observed for each week (as well as year, gender, age), 
 but population statistics are observed only for combinations of year, gender, and age.
 
-## Probabilities and adjusted Expectations
+### Probabilities and adjusted Expectations
 Death counts at week $J=j, W=w$ can be adjusted for
 - $P(A=a, G=g)$: average joint distribution of age and gender, 
 - $E(N)$: average population count,
@@ -61,7 +62,7 @@ $$
 $$
 $\forall j \in \{2016,\ldots,2020\}, w \in \{1,\ldots,53\}$
 
-### Notes regarding Notation (Photo Rolf)
+#### Notes regarding Notation (Photo Rolf)
 were expanded with $W$ for week number.
 
 Formel (1)
