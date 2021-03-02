@@ -48,7 +48,7 @@ sx = repeat(geschlechter, inner = length(altersgruppen))
 groupedbar(string.(nam), mn, group = sx, ylabel = "% der Bevölkerung", 
            left_margin=50px,
            palette=lcolors, 
-           title = "Durchschnittliche der Altersgruppen-Geschlechts-Verteilung")
+           title = "Durchschnitt Altersgruppen-Geschlechts-Verteilung")
 savefig(joinpath(@OUTPUT, "PAG_mean.svg")) 
 
 

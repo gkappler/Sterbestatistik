@@ -1,5 +1,6 @@
 # This file was generated, do not modify it. # hide
 include("./_assets/scripts/groups.jl") # hide
+altersgruppen = altersgruppen_months
 include("./_assets/scripts/population.jl") # hide
 include("./_assets/scripts/deaths.jl") # hide
 

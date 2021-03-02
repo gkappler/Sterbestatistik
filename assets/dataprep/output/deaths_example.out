@@ -1,2 +1,2 @@
-LoadError: UndefVarError: altersgruppen not defined
-in expression starting at /home/runner/work/Sterbestatistik/Sterbestatistik/_assets/scripts/population.jl:37
+f(alter = 0:30, geschlecht = "Männlich", jahr = 2020, kw = 1) = (N = 12943028, D = 84)
+f(alter = 30:35, geschlecht = "Männlich", jahr = 2020) = (N = 2830265, D = 1798)

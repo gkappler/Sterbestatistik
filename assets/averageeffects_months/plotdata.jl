@@ -52,4 +52,5 @@ expected_deaths[:,:D_sum_sum_EN] = round.(expected_deaths.D_sum_sum ./ [ N_sum[y
 @df expected_deaths plot!(:Jahr,:Dadj_sum_sum; label="age-gender adjusted", lw=3)
 
 savefig(joinpath(@OUTPUT, "adjusted_deaths_years.svg")) # hide
+
 #fdplotly(json(plt)) # hide
