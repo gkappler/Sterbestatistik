@@ -132,7 +132,7 @@ In an aging society the actual mortality counts are biased.
 
 \fig{./adjusted_deaths}
 
-The age- and gender-adjusted mortality counts in 2020 are generally lower
+The age- and gender-adjusted mortality counts in 2020 are generally lower than the unadjusted counts
 because the German population has been steadily aging in recent years.
 
 ### Year aggregated mortality
