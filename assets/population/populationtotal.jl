@@ -10,7 +10,7 @@ plot(
     bar(jahre, [ (N_sum[j]) for j in jahre],
         color=lcolors, 
         left_margin=50px,
-        ylims=extrema(values(N_sum)), 
+        ylims=(81000000,83500000), 
         yformatter=:plain,
         title="Bevölkerung", legend=:none)
 )
